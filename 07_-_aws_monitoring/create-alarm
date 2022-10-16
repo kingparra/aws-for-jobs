@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+# What details do you need in order to create an alarm from the web console?
+#
+# * Namespac
+# * Metric
+# * Statistic (sum, min, max, average, etc)
+# * Period (1, 5, 10, 30 or any multiple of 60 seconds)
+# * Conditions (greater, greater/equal, lower/equal, lower)
+# * Additional configuration
+# * Action
+
+# Required arguments:
+#   --alarm-name
+#   --evaluation-period
+#   --comparison-operator
+aws cloudwatch put-metric-alarm \
+  --alarm-description     "Alarm when CPU exceeds 75 percent" \
+  --alarm-name            cpu-yellow-trail                    \
+  --metric-name           CPUUtilization                      \
+  --namespace             AWS/EC2                             \
+  --statistic             Average                             \
+  --period                300                                 \
+  --threshold             75                                  \
+  --comparison-operator   GreaterThanThreshold                \
+  --dimensions            "Name=InstanceId,Value=i-12345678"  \
+  --evaluation-periods    2                                   \
+  --alarm-actions         arn:aws:sns:us-east-1:111122223333:MyCPUTopic \
+  --unit Percent

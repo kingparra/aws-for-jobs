@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Download all of the AWS documentation.
+
+mkdir awsdocs && cd awsdocs
+
+# Get urls for all of the aws developer guides
+IFS=$'\n' mapfile -d $'\n' -t repos < \
+  <(curl -s 'https://api.github.com/users/awsdocs/repos' | jq .[].clone_url | sed 's_"__g')
+
+for repo in "${repos[@]}"; do
+    git clone "$repo"
+done
+
+# Get pdf guides for aws ec2
+#
+# Manually scraped from this page
+# https://docs.aws.amazon.com/ec2/?icmpid=docs_homepage_featuredsvcs
+#
+# Using this JS in the web inspector
+# let    d = [...document.querySelectorAll("a.awsui_link_4c84z_1lqq5_93")]
+# let pdfs = d.filter(x => x.href.endsWith(".pdf")).map(x => x.href)
+#
+ec2_pdfs=(
+ 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-ug.pdf'
+ 'https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-wg.pdf'
+ 'https://docs.aws.amazon.com/enclaves/latest/user/enclaves-user.pdf'
+ 'https://docs.aws.amazon.com/AWSEC2/latest/APIReference/ec2-api.pdf'
+ 'https://docs.aws.amazon.com/ec2-instance-connect/latest/APIReference/ec2-instance-connect-api.pdf'
+ 'https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-dg.pdf'
+ 'https://docs.aws.amazon.com/autoscaling/ec2/APIReference/as-api.pdf'
+ 'https://docs.aws.amazon.com/vm-import/latest/userguide/vm-import-ug.pdf'
+ 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-ug.pdf'
+ 'https://docs.aws.amazon.com/sql-server-ec2/latest/userguide/sql-server-ec2.pd'
+)
+
+for pdf in "${ec2_pdfs[@]}"; do
+  wget "$pdf"
+done

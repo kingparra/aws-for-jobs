@@ -1,0 +1,34 @@
+# Configure editor settings to match bash style guide
+# http://editorconfig.org
+
+[*]
+indent_style = space
+indent_size = 2
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+
+
+[.git*]
+indent_size= tab
+indent_style = tab
+
+# Hard tabs may be used for here-docs <<- EOF,
+# but spaces are prefered because it makes it
+# possible to copy-paste commands directly from
+# the source file into an interactive shell
+# prompt without triggering tab completion.
+[**/**.bash]
+indent_size = 2
+indent_style = space
+shell_variant = bash
+binary_next_line = true
+switch_case_indent = true
+space_redirects = true
+keep_padding = false
+
+
+[**/**.bats]
+indent_size = 2
+indent_style = space
+shell_variant = bats
