@@ -5,6 +5,12 @@ Module 8: Scaling and elasticity
 DEMO Create a Launch Configuration
 ----------------------------------
 
+
+ASGSecurityGroup
+^^^^^^^^^^^^^^^^
+* Name: ASGSecurityGroup
+* Allow port 22
+
 my-yellowtail-launch-configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 * Name           : my-yellowtail-launch-configuration
@@ -38,7 +44,8 @@ YellowTailSimpleScalingPolicy
 * CloudWatch Alarm:
 
   * Name: YellowTailCPUOver80PercentAlarm
-  * Action: Add 2 capacity units and then wait 120 seconds before allowing another scaling activity
+  * Action: Add 2 capacity units and then wait 120 seconds before
+    allowing another scaling activity
 
 YellowTailSimpleScalingPolicy2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -47,15 +54,35 @@ YellowTailSimpleScalingPolicy2
 * CloudWatch Alarm:
 
   * Name: YellowTailCPUUnder20PercentAlarm
-  * Action: Remove 2 capacity units and then wait 120 seconds before allowing another scaling activity
+  * Action: Remove 2 capacity units and then wait 120 seconds
+    before allowing another scaling activity
 
 Target Tracking Policy
 ^^^^^^^^^^^^^^^^^^^^^^
-# Shown briefly at timestamp 02:35, this policy is implicitly created by the web console.
+# Shown briefly at timestamp 02:35, this policy is implicitly
+# created by the web console.
 
 * Scaling policy name : Target Tracking Policy
 * Policy type         : Target tracking scaling
-* Execute policy when : As required to maintain average CPU utilization at 50%.
+* Execute policy when : As required to maintain average CPU
+                        utilization at 50%.
 * Action              : Add or remove capacity units as required.
 * Instances need      : 120 seconds to warm up before including in metric.
 * Scale in            : Enabled
+
+
+Lesson 2: AWS SQS
+-----------------
+
+Decoupling your architecture
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Decoupled components work in isolation of each other.
+Decoupled components do not have knowledge of the
+implementation details of other components.
+
+Cohesion refers to the degree to which the elements inside a
+module belong together.
+
+https://www.wikiwand.com/en/Coupling_%28computer_programming%29
+
+
