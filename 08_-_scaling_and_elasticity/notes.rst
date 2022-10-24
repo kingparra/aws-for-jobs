@@ -35,7 +35,14 @@ my-yellowtail-ASG
 
 DEMO Create a Simple Scaling Policy
 -----------------------------------
-Auto scaling group name: my-yellowtail-ASG
+my-yellowtail-ASG
+^^^^^^^^^^^^^^^^^
+
+YellowTailCPUUnder20PercentAlarm
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+YellowTailCPUOver80PercentAlarm
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 YellowTailSimpleScalingPolicy
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -57,6 +64,7 @@ YellowTailSimpleScalingPolicy2
   * Action: Remove 2 capacity units and then wait 120 seconds
     before allowing another scaling activity
 
+
 Target Tracking Policy
 ^^^^^^^^^^^^^^^^^^^^^^
 # Shown briefly at timestamp 02:35, this policy is implicitly
@@ -76,7 +84,10 @@ Lesson 2: AWS SQS
 
 Decoupling your architecture
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Decoupled components work in isolation of each other.
+Components of a system can be said to be tightly coupled or loosely coupled
+with each other.
+
+When components are decoupled they work in isolation of each other.
 Decoupled components do not have knowledge of the
 implementation details of other components.
 
