@@ -4,18 +4,11 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 4.0"
     }
-/*
-    random = {
-      source = "hashicorp/random"
-      version = "3.4.3"
+    tls = {
+      source = "hashicorp/tls"
+      version = "4.0.3"
     }
-*/
   }
-}
-
-
-provider "random" {
-  # Configuration options
 }
 
 
@@ -26,43 +19,126 @@ provider "aws" {
 }
 
 
-/*
-Tag everything with mod8_project1_${random_id}
 
-Security group
-name: web
-description: "ELB for a webserver cluster"
-source: anywhwere
+# Elastic load balancing
+########################
+resource "aws_security_group" "elb_sg" {
+  name        = "web"
+  description = "Allow SSH traffic"
+  ingress {
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+  }
+  ingress {
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = var.tag
+  }
+}
 
 
-EC2 Load balancer
-lbname: web
-listener configuration: HTTP
-subnets in these AZs: us-east-1{a,b,c,d,e,f}
-security groups: web
-health check:
-* ping protocol: TCP
-* ping port: 80
+resource "aws_elb" "elb" {
+  name = "web"
+  availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c", "us-east-1d", "us-east-1e", "us-east-1f"]
+  listener {
+    lb_port = 80
+    lb_protocol = "http"
+    instance_port      = 80
+    instance_protocol  = "http"
+  }
+  tags = {
+    Name = var.tag
+  }
+}
 
 
-Security group
-name: webserver-cluster
-description: "Webserver security group"
-inbound rules:
-* Allow SSH from anywhere
-* Allow HTTP from anywhere
+
+# Launch template
+#################
+resource "aws_security_group" "lt_sg" {
+  name        = "webserver-cluster"
+  description = "Allow SSH traffic"
+  ingress {
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+  }
+  ingress {
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = var.tag
+  }
+}
 
 
-Keypair
-name: YellowTailKeyPair
+resource "tls_private_key" "keys" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
 
-Launch template
-name: webserver-cluster
-description: "Project launch template"
-ami: Latest AMZL ami
-type: t3.micro
-keypair: YellowTailKeyPair
-Security groups: webserver-cluster
-Detailed CloudWatch monitoring: Enable
-Userdata: see userdata.sh
-*/
+
+resource "aws_key_pair" "aws_keys" {
+  key_name   = "YellowTailKeyPair"
+  public_key = tls_private_key.keys.public_key_openssh
+}
+
+
+resource "aws_launch_template" "lt" {
+  name = "webserver-cluster"
+  description = "Project launch template"
+  image_id = data.aws_ami.azl.id
+  vpc_security_group_ids = [aws_security_group.lt_sg.id]
+  instance_type = "t3.micro"
+  monitoring {
+    enabled = true
+  }
+  key_name = aws_key_pair.aws_keys.key_name
+  user_data = base64encode(file("userdata.sh"))
+
+  tags = {
+    Name = var.tag
+  }
+}
+
+
+
+# TODO pick up from here, check pdf for details
+
+# Auto scaling group
+####################
+resource "aws_autoscaling_group" "asg" {
+  name = "webserver-client"
+  availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c", "us-east-1d", "us-east-1e", "us-east-1f"]
+  desired_capacity   = 1
+  max_size           = 1
+  min_size           = 1
+
+  launch_template {
+    id      = aws_launch_template.lt.id
+    version = "$Latest"
+  }
+}
+
