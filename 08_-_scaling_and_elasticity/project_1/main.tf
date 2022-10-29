@@ -5,7 +5,7 @@ terraform {
       version = "~> 4.0"
     }
     tls = {
-      source = "hashicorp/tls"
+      source  = "hashicorp/tls"
       version = "4.0.3"
     }
   }
@@ -13,8 +13,8 @@ terraform {
 
 
 provider "aws" {
-  region                   = var.account_details.region
-  shared_config_files      = var.account_details.shared_config_files
+  region = var.account_details.region
+  shared_config_files = var.account_details.shared_config_files
   shared_credentials_files = var.account_details.shared_credentials_files
 }
 
@@ -50,13 +50,13 @@ resource "aws_security_group" "elb_sg" {
 
 
 resource "aws_elb" "elb" {
-  name = "web"
+  name               = "web"
   availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c", "us-east-1d", "us-east-1e", "us-east-1f"]
   listener {
-    lb_port = 80
-    lb_protocol = "http"
-    instance_port      = 80
-    instance_protocol  = "http"
+    lb_port           = 80
+    lb_protocol       = "http"
+    instance_port     = 80
+    instance_protocol = "http"
   }
   tags = {
     Name = var.tag
@@ -107,17 +107,16 @@ resource "aws_key_pair" "aws_keys" {
 
 
 resource "aws_launch_template" "lt" {
-  name = "webserver-cluster"
-  description = "Project launch template"
-  image_id = data.aws_ami.azl.id
+  name                   = "webserver-cluster"
+  description            = "Project launch template"
+  image_id               = data.aws_ami.azl.id
   vpc_security_group_ids = [aws_security_group.lt_sg.id]
-  instance_type = "t3.micro"
+  instance_type          = "t3.micro"
   monitoring {
     enabled = true
   }
-  key_name = aws_key_pair.aws_keys.key_name
+  key_name  = aws_key_pair.aws_keys.key_name
   user_data = base64encode(file("userdata.sh"))
-
   tags = {
     Name = var.tag
   }
@@ -125,20 +124,54 @@ resource "aws_launch_template" "lt" {
 
 
 
-# TODO pick up from here, check pdf for details
-
 # Auto scaling group
 ####################
+/*
+// I can't figure out how to "Enable group metrics collection"
+// for the autoscaling group.
+//
+// I'm also not sure how to set the autoscaling policy to go off
+// of average cpu %.
+//
+// So I'm doing this by hand in the web console.
+//
 resource "aws_autoscaling_group" "asg" {
-  name = "webserver-client"
-  availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c", "us-east-1d", "us-east-1e", "us-east-1f"]
-  desired_capacity   = 1
-  max_size           = 1
-  min_size           = 1
-
+  name = "webserver-cluster"
   launch_template {
     id      = aws_launch_template.lt.id
     version = "$Latest"
   }
+  availability_zones = [ "us-east-1a"
+                       , "us-east-1b"
+                       , "us-east-1c"
+                       , "us-east-1d"
+                       , "us-east-1e"
+                       , "us-east-1f"
+                       ]
+  health_check_type         = "ELB"
+  health_check_grace_period = 120
+  // How do I set "Enable group metrics collection within CloudWatch"
+  min_size                  = 1
+  desired_capacity          = 1
+  max_size                  = 5
+  tags = {
+    Name = var.tag
+  }
 }
+
+
+resource "aws_autoscaling_attachment" "asg_attachment" {
+  autoscaling_group_name = aws_autoscaling_group.asg.id
+  elb                    = aws_elb.elb.id
+}
+
+
+resource "aws_autoscaling_policy" "sp3" {
+  autoscaling_group_name = aws_autoscaling_group.asg.name
+  name = "Project scaling policy"
+// Metric type: Select Average CPU utilization
+// Target value: 80
+// Instances need: 0
+}
+*/
 

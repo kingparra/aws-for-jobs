@@ -70,11 +70,14 @@ name: webserver-cluster
 configure settings: Adhere to launch template
 subnets in these AZs: us-east-1{a,b,c,d,e,f}
 load balancing: Attach to an existing load balancer "web"
-health check type: checked
+health check type: ELB
 health check grace period: 120
 monitoring: Enable group metrics collection within CloudWatch
 scaling policies:
 * Project scaling policy
+desired capacity: 1
+minimum capacity: 1
+maximum capacity: 5
 
 Scaling policy
 ^^^^^^^^^^^^^^
