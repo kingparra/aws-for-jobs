@@ -13,8 +13,8 @@ terraform {
 
 
 provider "aws" {
-  region = var.account_details.region
-  shared_config_files = var.account_details.shared_config_files
+  region                   = var.account_details.region
+  shared_config_files      = var.account_details.shared_config_files
   shared_credentials_files = var.account_details.shared_credentials_files
 }
 
@@ -111,7 +111,7 @@ resource "aws_launch_template" "lt" {
   description            = "Project launch template"
   image_id               = data.aws_ami.azl.id
   vpc_security_group_ids = [aws_security_group.lt_sg.id]
-  instance_type          = "t3.micro"
+  instance_type          = "t2.micro"
   monitoring {
     enabled = true
   }
@@ -126,15 +126,8 @@ resource "aws_launch_template" "lt" {
 
 # Auto scaling group
 ####################
-/*
 // I can't figure out how to "Enable group metrics collection"
 // for the autoscaling group.
-//
-// I'm also not sure how to set the autoscaling policy to go off
-// of average cpu %.
-//
-// So I'm doing this by hand in the web console.
-//
 resource "aws_autoscaling_group" "asg" {
   name = "webserver-cluster"
   launch_template {
@@ -151,11 +144,13 @@ resource "aws_autoscaling_group" "asg" {
   health_check_type         = "ELB"
   health_check_grace_period = 120
   // How do I set "Enable group metrics collection within CloudWatch"
-  min_size                  = 1
-  desired_capacity          = 1
-  max_size                  = 5
-  tags = {
-    Name = var.tag
+  min_size         = 1
+  desired_capacity = 1
+  max_size         = 5
+  tag {
+    key = "Name"
+    value = var.tag
+    propagate_at_launch = true
   }
 }
 
@@ -167,11 +162,55 @@ resource "aws_autoscaling_attachment" "asg_attachment" {
 
 
 resource "aws_autoscaling_policy" "sp3" {
+
   autoscaling_group_name = aws_autoscaling_group.asg.name
-  name = "Project scaling policy"
-// Metric type: Select Average CPU utilization
-// Target value: 80
-// Instances need: 0
+  name                   = "Project scaling policy"
+  policy_type            = "PredictiveScaling"
+  ##############################################################
+  ## This whole block is to say "80% average cpu utilization" ##
+  ##############################################################
+  predictive_scaling_configuration {
+    metric_specification {
+      target_value = 80
+      customized_load_metric_specification {
+        metric_data_queries {
+          id         = "load_sum"
+          expression = "SUM(SEARCH('{AWS/EC2,AutoScalingGroupName} MetricName=\"CPUUtilization\" ${aws_autoscaling_group.asg.name}', 'Sum', 3600))"
+        }
+      }
+      customized_scaling_metric_specification {
+        metric_data_queries {
+          id = "scaling"
+          metric_stat {
+            metric {
+              metric_name = "CPUUtilization"
+              namespace   = "AWS/EC2"
+              dimensions {
+                name  = "AutoScalingGroupName"
+                value = aws_autoscaling_group.asg.name
+              }
+            }
+            stat = "Average"
+          }
+        }
+      }
+      customized_capacity_metric_specification {
+        metric_data_queries {
+          id          = "capacity_sum"
+          expression  = "SUM(SEARCH('{AWS/AutoScaling,AutoScalingGroupName} MetricName=\"GroupInServiceIntances\" my-test-asg', 'Average', 300))"
+          return_data = false
+        }
+        metric_data_queries {
+          id          = "load_sum"
+          expression  = "SUM(SEARCH('{AWS/EC2,AutoScalingGroupName} MetricName=\"CPUUtilization\" my-test-asg', 'Sum', 300))"
+          return_data = false
+        }
+        metric_data_queries {
+          id         = "weighted_average"
+          expression = "load_sum / capacity_sum"
+        }
+      }
+    }
+  }
 }
-*/
 

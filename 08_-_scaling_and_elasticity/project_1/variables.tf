@@ -9,6 +9,7 @@ variable "account_details" {
 
 
 variable "tag" {
+  type = string
   default = "mod8_project1_ses1"
 }
 
