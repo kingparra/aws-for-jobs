@@ -24,7 +24,9 @@ provider "aws" {
 ########################
 resource "aws_security_group" "elb_sg" {
   name        = "web"
-  description = "Allow SSH traffic"
+  description = "ELB for a webserver cluster"
+  # SSH is not enabled in the instructions.
+  # I've added it here in order to test out ssh'ing into the instances.
   ingress {
     cidr_blocks = ["0.0.0.0/0"]
     from_port   = 22
@@ -95,8 +97,7 @@ resource "aws_security_group" "lt_sg" {
 
 
 resource "tls_private_key" "keys" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
+  algorithm = "ED25519"
 }
 
 
@@ -126,8 +127,7 @@ resource "aws_launch_template" "lt" {
 
 # Auto scaling group
 ####################
-// I can't figure out how to "Enable group metrics collection"
-// for the autoscaling group.
+// I can't figure out how to "Enable group metrics collection" for the autoscaling group.
 resource "aws_autoscaling_group" "asg" {
   name = "webserver-cluster"
   launch_template {
@@ -162,7 +162,6 @@ resource "aws_autoscaling_attachment" "asg_attachment" {
 
 
 resource "aws_autoscaling_policy" "sp3" {
-
   autoscaling_group_name = aws_autoscaling_group.asg.name
   name                   = "Project scaling policy"
   policy_type            = "PredictiveScaling"

@@ -18,7 +18,8 @@ Security group
 ^^^^^^^^^^^^^^
 name: web
 description: "ELB for a webserver cluster"
-source: anywhwere
+protocol: TCP port 80
+source: anywhere
 
 
 EC2 Load balancer
