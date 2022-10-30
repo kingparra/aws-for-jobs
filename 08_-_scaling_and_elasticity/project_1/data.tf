@@ -7,11 +7,3 @@ data "aws_ami" "azl" {
     values = ["amzn2-ami-hvm*"]
   }
 }
-
-
-# Get instances in autoscaling group
-data "aws_instances" "ins" {
-  instance_tags = {
-    Name = var.tag
-  }
-}
