@@ -25,14 +25,6 @@ provider "aws" {
 resource "aws_security_group" "elb_sg" {
   name        = "web"
   description = "ELB for a webserver cluster"
-  # SSH is not enabled in the instructions.
-  # I've added it here in order to test out ssh'ing into the instances.
-  ingress {
-    cidr_blocks = ["0.0.0.0/0"]
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-  }
   ingress {
     cidr_blocks = ["0.0.0.0/0"]
     from_port   = 80
