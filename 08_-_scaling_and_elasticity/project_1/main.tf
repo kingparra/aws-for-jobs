@@ -45,7 +45,13 @@ resource "aws_security_group" "elb_sg" {
 
 resource "aws_elb" "elb" {
   name               = "web"
-  availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c", "us-east-1d", "us-east-1e", "us-east-1f"]
+  availability_zones = [ "us-east-1a"
+                       , "us-east-1b"
+                       , "us-east-1c"
+                       , "us-east-1d"
+                       , "us-east-1e"
+                       , "us-east-1f"
+                       ]
   listener {
     lb_port           = 80
     lb_protocol       = "http"
@@ -104,7 +110,9 @@ resource "aws_launch_template" "lt" {
   description            = "Project launch template"
   image_id               = data.aws_ami.azl.id
   vpc_security_group_ids = [aws_security_group.lt_sg.id]
-  instance_type          = "t2.micro"
+  # The description says t3.micro, but I get
+  # access denied errors.
+  instance_type = "t2.micro"
   monitoring {
     enabled = true
   }
@@ -119,7 +127,6 @@ resource "aws_launch_template" "lt" {
 
 # Auto scaling group
 ####################
-// I can't figure out how to "Enable group metrics collection" for the autoscaling group.
 resource "aws_autoscaling_group" "asg" {
   name = "webserver-cluster"
   launch_template {
@@ -135,13 +142,37 @@ resource "aws_autoscaling_group" "asg" {
                        ]
   health_check_type         = "ELB"
   health_check_grace_period = 120
-  // How do I set "Enable group metrics collection within CloudWatch"
+  // This corresponds to checking "enable group metrics collection" in the web ui.
+  metrics_granularity = "1Minute"
+  enabled_metrics = [ "GroupPendingInstances"
+                    , "GroupDesiredCapacity"
+                    , "GroupInServiceCapacity"
+                    , "GroupInServiceInstances"
+                    , "GroupMaxSize"
+                    , "WarmPoolPendingCapacity"
+                    , "WarmPoolTerminatingCapacity"
+                    , "GroupTerminatingCapacity"
+                    , "WarmPoolTotalCapacity"
+                    , "GroupPendingCapacity"
+                    , "GroupTerminatingInstances"
+                    , "WarmPoolMinSize"
+                    , "GroupAndWarmPoolDesiredCapacity"
+                    , "GroupTotalInstances"
+                    , "WarmPoolDesiredCapacity"
+                    , "WarmPoolWarmedCapacity"
+                    , "GroupAndWarmPoolTotalCapacity"
+                    , "GroupStandbyCapacity"
+                    , "GroupTotalCapacity"
+                    , "GroupMinSize"
+                    , "GroupStandbyInstances"
+                    ]
+
   min_size         = 1
   desired_capacity = 1
   max_size         = 5
   tag {
-    key = "Name"
-    value = var.tag
+    key                 = "Name"
+    value               = var.tag
     propagate_at_launch = true
   }
 }
@@ -185,6 +216,7 @@ resource "aws_autoscaling_policy" "sp3" {
           }
         }
       }
+
       customized_capacity_metric_specification {
         metric_data_queries {
           id          = "capacity_sum"
