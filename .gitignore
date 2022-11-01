@@ -4,3 +4,5 @@
 *.tfstate*
 *.terraform*
 terraform.tfstate*
+.vscode
+.~*
