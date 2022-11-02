@@ -98,3 +98,9 @@ Questions
   uses SQS (or something like it) to help decouple it's architecture?
 * What are the different scaling policy types?
 * What are a few different way that I can write scaling policies in terraform?
+* When should I use AWS Auto Scaling vs. Amazon EC2 Auto Scaling?
+
+  * You should use AWS Auto Scaling to manage scaling for multiple
+    resources across multiple services.
+
+* How can I set up my launch template to "enable group metrics collection"?
