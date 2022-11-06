@@ -58,15 +58,15 @@ resource "aws_route_table_association" "midterm-rtb-public-rtbassoc-02b1538704df
 
 resource "aws_route_table_association" "midterm-rtb-private1-us-east-1a-rtbassoc-0eb83f5e0c956c40b" {
   route_table_id = aws_route_table.midterm-rtb-private1-us-east-1a.id
-  subnet_id      = aws_subnet.subnet-00e517c733f3793c7-midterm-subnet-private1-us-east-1a.id
+  subnet_id      = aws_subnet.midterm-subnet-private1.id
 }
 
 resource "aws_route_table_association" "midterm-rtb-private2-us-east-1b-rtbassoc-007a8e6bd647f36b9" {
   route_table_id = aws_route_table.midterm-rtb-private2-us-east-1b.id
-  subnet_id      = aws_subnet.subnet-023f4bbe3d8e5dac8-midterm-subnet-private2-us-east-1b.id
+  subnet_id      = aws_subnet.subnet-private2.id
 }
 
-resource "aws_subnet" "subnet-023f4bbe3d8e5dac8-midterm-subnet-private2-us-east-1b" {
+resource "aws_subnet" "subnet-private2" {
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = "10.0.3.0/24"
   availability_zone       = "us-east-1b"
@@ -96,7 +96,7 @@ resource "aws_subnet" "subnet-0b5472b288c48ac87-midterm-subnet-public2-us-east-1
   }
 }
 
-resource "aws_subnet" "subnet-00e517c733f3793c7-midterm-subnet-private1-us-east-1a" {
+resource "aws_subnet" "midterm-subnet-private1" {
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = "10.0.2.0/24"
   availability_zone       = "us-east-1a"
