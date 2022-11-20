@@ -1,1 +1,8 @@
 AWSTemplateFormatSection: 2010-09-09
+Description: >-
+  This template creates
+  an EC2 Instance with
+  Parameters and outputs
+  values like the web Server
+  Instance ID, Public and
+  Private IPs, Security Group
