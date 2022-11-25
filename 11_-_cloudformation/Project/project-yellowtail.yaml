@@ -1,0 +1,103 @@
+---
+
+
+Parameters:
+
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+
+  ProjectVPCCIDR:
+    Type: String
+    Default: "10.0.0.0/16"
+
+
+Resources:
+
+  ProjectVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref ProjectVPCCIDR
+      EnableDnsHostnames: true
+      EnableDnsSupport: false
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: Project VPC
+
+  ProjectInternetGateway:
+    Type: AWS::EC2::InternetGateway
+    DependsOn: ProjectVPC
+    Properties:
+      Tags:
+        - Key: Name
+          Value: Project IGW
+
+  GatewayAttachToProjectVPC:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref ProjectInternetGateway
+      VpcId: !Ref ProjectVPC
+
+  ProjectPublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1a
+      CidrBlock: "10.0.0.0/24"
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: Project Public Subnet
+      VpcId: !Ref ProjectVPC
+
+  ProjectPublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: Name
+          Value: Public Route Table Site A
+      VpcId: !Ref ProjectVPC
+
+  ProjectPublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: GatewayAttachToProjectVPC
+    Properties:
+      RouteTableId: !Ref ProjectPublicRouteTable
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: !Ref ProjectInternetGateway
+
+  PublicSubnetSiteAPublicRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref ProjectPublicRouteTable
+      SubnetId: !Ref ProjectPublicSubnet
+
+  MyProjectInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: "ami-064d05b4fe8515623"
+      KeyName: !Ref KeyName
+      SecurityGroupIds:
+        - !Ref RDPandHTTPSecurityGroup
+      SubnetId: !Ref ProjectPublicSubnet
+      InstanceType: "t2.micro"
+      Tags:
+        - Key: Name
+          Value: Instance US-EAST-1a
+
+  RDPandHTTPSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Enable RDP Access via Port 3389 and 80"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3389
+          ToPort: 3389
+          CidrIp: "0.0.0.0/0"
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: "0.0.0.0/0"
+      Tags:
+        - Key: Name
+          Value: RDP Security Group
+      VpcId: !Ref ProjectVPC
