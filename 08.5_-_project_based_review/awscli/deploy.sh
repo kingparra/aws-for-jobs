@@ -82,6 +82,16 @@ createKeyPair() {
 
 
 createInstance() {
+  IFS=$'\0' read -d $'\0' -r user_data < \
+<(cat << "EOF"
+  #!/usr/bin/env bash
+  set -xeuo pipefail
+  sudo yum update -y
+  sudo yum install -y httpd
+  sudo systemctl enable --now
+  sudo aws s3 sync s3://yt-websites-2023/energym-html /var/www/html
+EOF
+)
   # Create an instance that will serve as the basis for our golden image.
   aws ec2 run-instances \
     --image-id "$(
@@ -108,13 +118,7 @@ createInstance() {
         --query 'SecurityGroups[?GroupName==`EnergymSiteSG`]'
 
       )" \
-    --user-data \
-      "#!/usr/bin/env bash
-      set -xeuo pipefail
-      sudo yum update -y
-      sudo yum install -y httpd
-      sudo systemctl enable --now
-      sudo aws s3 sync s3://yt-websites-2023/energym-html /var/www/html" \
+    --user-data "$user_data" \
     --tag-specifications \
       "ResourceType=instance,Tags=[
          {Key=Client,Value=Energym},
