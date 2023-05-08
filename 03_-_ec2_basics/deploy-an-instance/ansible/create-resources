@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# This playbook creates an instance, SG, and keypair from the controller node, using boto3.
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/local_connection.html#local-connection
+ansible-playbook --connection=local create-resources.yaml
+
+ansible-inventory \
+  -i instances-by-assignmentname.aws_ec2.yaml \
+  --graph
+
+# vim: set filetype=bash

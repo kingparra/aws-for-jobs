@@ -1,0 +1,78 @@
+---
+# TODO
+# * Add tag with randomized session name
+# * Randmoze name of key pair, sg, and instance
+# * Output instance ipaddr
+# * Output keypair private key
+#
+# Honestly I'm not motivated to do any of that since I really dislike CF.
+
+Parameters:
+
+  # There are two ways to get the latest amzl2 ami, using ssm or
+  # by preprocessing this file with a lambda function.
+  LatestAmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+
+Resources:
+
+  # https://github.com/g-a-d/cloudformation-random-string
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloudformation-macro.html
+  #
+  # Macros run lambda functions on template documents for preprocessing.
+  #
+  # Macro:
+  #   Type: AWS::CloudFormation::Macro
+  #   Properties:
+  #     Name: SessionName
+  #     Description: >
+  #       A randmozed name to serve identify the session that was used to
+  #       create this resource.
+  #     FunctionName: arn:aws:lambda:us-east-1:972171577695:function:random-name
+
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: cf_sg_14
+      GroupDescription: "Allow ssh and http ingress to CF instance"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+  CFKeyPair:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: mod3deploycfkeypair_14
+      KeyType: ed25519
+
+  CFInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref LatestAmiId
+      InstanceType: t2.micro
+      KeyName: !Ref CFKeyPair
+      Tags:
+        - Key: Name
+          Value: CFinstance_14
+      NetworkInterfaces:
+        - DeviceIndex: "0"
+          AssociatePublicIpAddress: "true"
+          GroupSet: [!Ref InstanceSecurityGroup]
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #!/bin/bash
+            sudo yum install -y openscap scap-security-guide httpd
+            sudo systemctl enable --now httpd
+            sudo oscap xccdf eval \
+              --profile stig-rhel7-disa \
+              --report /tmp/report.html \
+              /usr/share/xml/scap/ssg/content/ssg-amzn2-xccdf.xml
+            sudo cp /tmp/report.html /var/www/html/

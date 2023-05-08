@@ -1,0 +1,42 @@
+# This is an experiment to pare down the output of aws ec2
+# describe-instances to show only fields that seem interesting
+# to me at the moment.
+
+- AmiLaunchIndex: 0
+  Tags: [{Key: Name, Value: attach-vols-to-me}]
+  State: {Code: 16, Name: running}
+# ...
+  PublicIpAddress: 3.95.137.45
+  PrivateIpAddress: 172.31.84.164
+# ...
+  InstanceId: i-0c13f72a743165df3
+  InstanceType: t2.micro
+  ImageId: ami-06d3b5e1ed9e1d982
+# ...
+  KeyName: demo-kp
+# ...
+  VpcId: vpc-07f267fa91cde428f
+  SubnetId: subnet-0a2f37ecd37158c8f
+  SecurityGroups: [{GroupId: sg-078b6bccbcecea9cb, GroupName: default}]
+# ...
+  Placement:
+    AvailabilityZone: us-east-1b
+#   ...
+# ...
+  NetworkInterfaces:
+#   ...
+# ...
+
+# aws ec2 describe-instances --query \
+#   "Reservations[].Instances[].{
+#      Name: Tags[?Key=='Name'].Value | [0],
+#      State: State.Name,
+#      Id: InstanceId,
+#      Type: InstanceType,
+#      Key: KeyName,
+#      Ami: ImageId,
+#      VpcId: VpcId,
+#      Az: Placement.AvailabilityZone,
+#      SnId: SubnetId,
+#      SgIds: SecurityGroups[].GroupId
+#   }"

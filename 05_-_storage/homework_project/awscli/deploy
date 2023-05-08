@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+generateBucketName() {
+  dd if=/dev/urandom bs=256 count=1 2>/dev/null \
+  | tr -dc 'a-z' \
+  | fold -w 10 \
+  | tr '\n' '-'
+}
+
+bucket_name="$(generateBucketName)"
+
+aws s3 mb "s3://$bucket_name"
+
+read -d $'\0' policy << EOF
+{
+  "Version":"2012-10-17",
+  "Statement":[
+    {
+      "Sid": "AddPerm",
+      "Effect":"Allow",
+      "Principal": "*",
+      "Action":["s3:GetObject"],
+      "Resource": "arn:aws:s3:::$bucket_name/*"
+    }
+  ]
+}
+
+EOF
+
+aws s3api put-bucket-policy \
+  --bucket "$bucket_name" \
+  --policy "$policy"
+
+aws s3 website "s3://$bucket_name" \
+  --index-document index.html \
+  --error-document error/error.html
+
+cd static-website-code && aws s3 sync . "s3://$bucket_name"
+
+url="http://${bucket_name}.s3-website-$(aws configure get region).amazonaws.com"
+
+# Echo the endpoint url for access to the static web page
+echo "$url"

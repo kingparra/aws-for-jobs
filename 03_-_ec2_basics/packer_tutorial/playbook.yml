@@ -1,0 +1,7 @@
+---
+- hosts: all
+  become: true
+  tasks:
+  - name: Set the hostname to my-awesome-image
+    ansible.builtin.hostname:
+      name: my-awesome-image

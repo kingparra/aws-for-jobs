@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Search for all ec2 instances with a tag named $1 and a vaule of $2.
+# The remaining arguments are passed to ''aws ec2 describe-instances''.
+aws ec2 describe-instances --filters Name=tag:"$1",Values="$2" "${@:3}"

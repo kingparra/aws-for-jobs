@@ -1,0 +1,14 @@
+---
+# This file name must end with aws_ec2.yaml for the plugin to work.
+plugin: aws_ec2
+regions:
+  - us-east-1
+hostnames:
+  - ip-address
+# filters:
+#   tag:AssignmentName: "mod3deploy"
+
+# Arrange instances into groups based on the value of the AssignmentName tag.
+keyed_groups:
+  - prefix: assignment
+    key: tags.AssignmentName

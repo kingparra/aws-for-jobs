@@ -1,0 +1,66 @@
+---
+- name: Create ec2 isntances
+  hosts: localhost
+  vars_files: [vars/tags.yaml]
+  # This play is run using boto3 from the controller node
+  tasks:
+
+    - name: SG
+      amazon.aws.ec2_security_group:
+        name: example
+        description: an example EC2 group
+        rules:
+          - proto: tcp
+            from_port: 80
+            to_port: 80
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 22
+            to_port: 22
+            cidr_ip: 0.0.0.0/8
+        tags:
+          AssignmentName: "{{ AssignmentName }}"
+          SessionName: "{{ SessionName }}"
+
+    - name: AMI
+      block:
+        - name: 'Get a list of all Amazon Linux 2 AMIs'
+          amazon.aws.ec2_ami_info:
+            owners:
+              - amazon
+            filters:
+              name: amzn2-ami-hvm-*-x86_64-gp2
+          register: amis
+        - name: Extract the most recently created AMI from that list
+          debug:
+            msg: "{{ amis.images[-1].image_id }}"
+          register: ami
+
+    - name: Keypair
+      block:
+        - name: Generate key material on the controller node
+          community.crypto.openssh_keypair:
+            type: ed25519
+            path: "~/.ssh/{{ AssignmentName}}_{{ SessionName }}"
+          register: keypair
+        - name: Create the ec2 keypair resource from that material
+          amazon.aws.ec2_key:
+            name: "{{ AssignmentName }}_{{ SessionName }}_keypair"
+            key_material: "{{ keypair.public_key }}"
+            tags:
+              AssignmentName: "{{ AssignmentName }}"
+              SessionName: "{{ SessionName }}"
+
+    - name: Instance
+      amazon.aws.ec2_instance:
+        name: ansible_deployed_instance_9
+        key_name: "{{ AssignmentName }}_{{ SessionName }}_keypair"
+        instance_type: t2.micro
+        image_id: "{{ ami.msg }}"
+        network:
+          assign_public_ip: true
+        user_data: "{{ lookup('file', './user-data.bash') }}"
+        tags:
+          AssignmentName: "{{ AssignmentName }}"
+          SessionName: "{{ SessionName }}"
+      delegate_to: localhost

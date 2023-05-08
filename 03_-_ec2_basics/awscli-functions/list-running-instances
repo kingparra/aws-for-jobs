@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+aws ec2 describe-instances \
+  --filter "Name=instance-state-name,Values=['running']" \
+  --query \
+    "Reservations[].Instances[].{
+       Name: Tags[?Key=='Name'].Value[0],
+       State: State.Name,
+       Id: InstanceId,
+       Type: InstanceType,
+       Key: KeyName,
+       Ami: ImageId,
+       VpcId: VpcId,
+       Az: Placement.AvailabilityZone,
+       SnId: SubnetId,
+       SgIds: SecurityGroups[].GroupId[0]
+    }" \
+  "$@"

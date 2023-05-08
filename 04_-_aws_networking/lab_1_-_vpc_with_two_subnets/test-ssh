@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+terraform output -raw private_key > ~/.ssh/mod4labkey
+chmod 0600 ~/.ssh/mod4labkey
+ssh-add ~/.ssh/mod4labkey
+ssh -AJ ec2-user@"$(terraform output -raw public_instance_ip)" ec2-user@"$(terraform output -raw private_instance_ip)"
+

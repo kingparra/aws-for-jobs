@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Install prequisites to run the playbook system wide.
+sudo dnf install python3-boto3 python3-botocore ansible
+ansible-galaxy collection install amazon.aws.ec2_instance
+
+# vim: set filtype=bash

@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+terraform output -raw private_key > ~/.ssh/ikey

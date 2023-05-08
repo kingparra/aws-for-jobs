@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+sudo yum install -y amazon-efs-utils
+sudo mkdir -p /mnt/shared
+sudo touch /user_data_run_token
+sudo echo "${fs_id}:/ /mnt/shared efs _netdev,noresvport,tls,iam 0 0" >> /etc/fstab
+sudo mount -a
