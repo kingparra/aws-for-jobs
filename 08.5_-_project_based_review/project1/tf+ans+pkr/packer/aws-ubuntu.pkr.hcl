@@ -20,7 +20,7 @@ data "amazon-ami" "amzl" {
 
 source "amazon-ebs" "amzl" {
   source_ami = data.amazon-ami.amzl.id
-  ami_name = "AmazonLinux2"
+  ami_name = "EnergymGoldenImage"
   instance_type = "t2.micro"
   ssh_username = "ec2-user"
   ssh_timeout = "5m"
