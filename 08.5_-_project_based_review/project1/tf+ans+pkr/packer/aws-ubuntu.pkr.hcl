@@ -67,6 +67,6 @@ build {
       ## gets passed verbatim to ssh, which does it's
       ## own argument parsing.
       "-o IdentitiesOnly=yes -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa"
-      ]
+    ]
   }
 }

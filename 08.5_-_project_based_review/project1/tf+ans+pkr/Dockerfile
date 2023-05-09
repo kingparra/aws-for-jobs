@@ -24,4 +24,4 @@ WORKDIR /project
 VOLUME [ "/project" ]
 
 # Set the command to run the /project/run file
-CMD [ "/bin/bash", "-c", "/project/run" ]
+CMD [ "/bin/bash", "/project/run" ]
