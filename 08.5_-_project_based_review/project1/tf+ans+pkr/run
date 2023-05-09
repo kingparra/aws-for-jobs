@@ -1,4 +1,17 @@
 #!/usr/bin/env bash
-# This file should be the main entry point to the deployment, and run
-# terratest, terraform, ansible, packer, and go.
-echo not implemented >&2
+set -euo pipefail
+
+echo "ERROR: Not implemented! Failing fast!" >&2
+exit 1
+
+# Run the tests
+cd tests && go test .; cd -
+
+# Build the AMI
+cd packer && packer build .; cd -
+
+# Provision the infrastructure
+cd terraform && terraform apply; cd -
+
+# Ping the instances with ansible
+cd ansible && ansible-playbook; cd -
