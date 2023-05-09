@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# This file should be the main entry point to the deployment, and run
+# terratest, terraform, ansible, packer, and go.
+echo not implemented >&2

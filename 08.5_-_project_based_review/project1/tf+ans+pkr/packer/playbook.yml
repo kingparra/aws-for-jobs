@@ -1,0 +1,22 @@
+---
+- name: Set up static site server with apache and files
+  hosts: all
+  become: true
+  tasks:
+
+    - name: Ping the image server
+      ansible.builtin.ping:
+
+    - name: Install apache server
+      ansible.builtin.yum:
+        name: httpd
+        state: present
+
+    - name: Start and enable apache server
+      ansible.builtin.systemd:
+        name: httpd
+        enabled: true
+        state: started
+
+    - name: Pull static files from S3
+      ansible.builtin.command: aws s3 sync s3://yt-websites-2023/energym-html/ /var/www/html/
