@@ -150,13 +150,14 @@ relational databases.
 In DynamoDB an attribute is a Key-Value pair.
 
 In DynamoDB the primary key is composed of a *partition
-key* and an optional *sort key*.
+key* and an optional *sort key*. **You can't add a sort
+key after your primary key has been created.**
 
 Dynamo also has the option of creating a *global
 secondary index* or GSI to speed up lookups of other
 attributes.
 
-One thing to know about tales is that they are
+One thing to know about tables is that they are
 region-specific.
 
 Working with data
@@ -173,7 +174,7 @@ and complex objects in json form.
 Import / Export / Backups
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 You can import and export from S3. Read about backups
-yourself.
+yourself. **You can also stream data to Kinesis.**
 
 Pricing
 ^^^^^^^
@@ -186,3 +187,4 @@ your tables.
 
 Provisioned capacity can be significantly less
 expensive than on-demand.
+
