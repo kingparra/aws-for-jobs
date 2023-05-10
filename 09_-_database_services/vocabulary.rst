@@ -1,123 +1,50 @@
 *********************
  Database vocabulary
 *********************
-This is an attempt to fill myself in on basic database vocabulary.
+I had a hard time understanding the slides for Module 9, so in these
+notes I an attempt to fill myself in on basic database vocabulary.
 
-Theses notes come from wikipedia, my personal
-experience with lambda calculus, the videos 
-from CMU Intro to Database Systems `here 
-<https://www.youtube.com/
-playlist?list=PLSE8ODhjZXjaKScG3l0nuOiDTTqpfnWFf>`_
-and `this course on SQL <https://www.masterywithsql.com/>`_.
+These notes mostly consist of summaries from articles on wikipedia,
+or these videos from CMU Intro to Database Systems `here <https://www.youtube.com/
+playlist?list=PLSE8ODhjZXjaKScG3l0nuOiDTTqpfnWFf>`_ and `this course on SQL
+<https://www.masterywithsql.com/>`_.
 
 
-What is a database?
--------------------
+Basics
+------
 Database
 
   Organized collection of interrelated data that models
   some aspect of the real world.
 
+Data model
 
-Tools
------
-Database Management System (DBMS)
-
-  Software used to interact with and manage the DB.
-
-  A general-purpose DBMS supports the definition,
-  creation, querying, update, and administration
-  of databases in accordance with some data model.
-
-Data Manipulation Language (DML)
-
-  Procedural: Specifies the high-level strategy to find
-  the desired result based on sets / bags.
-
-  Non-procedural (declarative): The query specifies
-  only what data is wanted and not how to find it.
-
-Structured Query Language (SQL)
-
-
-Tables, Rows, Columns and Cells
--------------------------------
-Table
-
-  A structure that organizes data into rows and
-  columns, forming a grid. A table has a specified
-  number of columns, but can have any number of rows.
-
-  (Table == Relation).
-  (Row == Record == Tuple).
-  (Column == Attribute).
-  (Cell == Field).
-
-  See the definition for relational algebra for more.
-
-
-Keys and their categories
--------------------------
-Key
-
-  A key is just a column that is used to sort records.
-
-  There are many classifications of keys based on how
-  they are used, or what kind of data is allowed in the
-  column, but that's the basic idea.
-
-Primary Key
-
-  A column (or multiple columns) that contains unique values 
-  that are used to identify a row. Each value is unique within 
-  the table and cannot be null.
-
-Foreign Key
-
-  A key that comes from another table. Foreign keys are a
-  mechanism for associating tables with each other.
-
-
-Theory
-------
-ACID
-
-CRUD
-
-Referential Integrity
-
-Data independence
-
-  Databases used to have tight coupling between what
-  the database looked like logically and the on-disk
-  machine implementation. The lookup path was dependent
-  on the data structure implementation.
+  A collection of concepts for describing the data in a database.
 
 Schema
 
   A description of a particular collection of data,
-  using a given data model. 
+  using a given data model.
 
 Data Model
 
   A data model is a collection of concepts for
   describing the data in a database.
 
-  Relational
+  Examples are:
 
-  Key/value, Graph, Document/Object, Wide-column/Column-family
+  * Relational
+  * Non-relational:
 
+    * Key/value
+    * Graph
+    * Document/Object
+    * Wide-column/Column-family
+
+
+Relational databases
+--------------------
 Relational Model
-
-  The relational model was introduced in the paper
-  "A relational model of data for large shared data 
-  banks" by E. F. Codd in June 1970. 
-  https://dl.acm.org/doi/10.1145/362384.362685
-
-  (Which is a follow up of a paper published in 1969
-  named "Derivability, redundancy and consistency of
-  relations stored in large data banks".
-  https://dl.acm.org/doi/10.1145/1558334.1558336)
 
   A model is an abstract description of a physical
   system (using a formal language, or mathematical
@@ -140,11 +67,148 @@ Relational Model
   * Structure: The definition of the databases
     relations and their contents.
 
-  * Integrity: Ensure the databases contents satisfy constraints.
+  * Integrity: Ensure the databases contents satisfy
+    constraints.
 
   * Manipulation: Programming interface for accessing
     and modifying a databases contents.
 
+  The relational model was introduced in the paper
+  "A relational model of data for large shared data
+  banks" by E. F. Codd in June 1970.
+  https://dl.acm.org/doi/10.1145/362384.362685
+
+  (Which is a follow up of a paper published in 1969
+  named "Derivability, redundancy and consistency of
+  relations stored in large data banks".
+  https://dl.acm.org/doi/10.1145/1558334.1558336)
+
+
+Transaction
+
+  A unit of work in database terms. Transactions are
+  often abbreviated to Tx. A transaction may correspond
+  to one or *multiple* SQL actions. There is a lot to
+  say about transactions, especially when it comes to
+  how they should be designed for a DB system to be
+  reliable.
+
+ACID
+
+  ACID is a set of desirable properties that a database
+  should have to ensure that transactions are processed
+  reliably.
+
+  Atomicity. Commits finish an entire operation
+  successfully or the database rolls back to its prior
+  state.
+
+  Consistency. Any change maintains data integrity or
+  is cancelled completely. Expressions cannot operate
+  on the underlying representation of a type.
+
+  Isolation. Any read or write will not be impacted by
+  other read or writes of separate transactions.
+
+  Durability. Committed transactions must be persisted
+  in non-volatile memory.
+
+  Here is a `short video <https://www.youtube.com/
+  watch?v=lGyMiW6PnKI>` of James ("Jim" Nicholas Gray,
+  the inventor of the term ACID, explaining what ACID
+  is about
+
+BASE
+
+  BASE is an alternative to ACID for partitioned
+  databases. I don't understand it well enough to
+  summarize it, but here is a good article.
+
+  https://queue.acm.org/detail.cfm?id=1394128
+
+Table
+
+  A structure that organizes data into rows and
+  columns, forming a grid. A table has a specified
+  number of columns, but can have any number of rows.
+
+  There are also mathematical terms for these things,
+  from relational algebra. Here's a summary of how they
+  map.
+
+  (Table == Relation).
+  (Row == Record == Tuple).
+  (Column == Attribute).
+  (Cell == Field).
+
+Key
+
+  A key is just a column that is used to sort records.
+
+  There are many classifications of keys based on how
+  they are used, or what kind of data is allowed in the
+  column, but that's the basic idea.
+
+Primary Key
+
+  A column (or multiple columns) that contains unique values
+  that are used to identify a row. Each value is unique within
+  the table and cannot be null.
+
+Foreign Key
+
+  A key that comes from another table. Foreign keys are a
+  mechanism for associating tables with each other.
+
+Integrity Constraints
+
+  Impose restrictions on allowable data, beyond those
+  imposed by structure and types.
+
+Referential Integrity
+
+  Integrity of references. Sort of equivalent to having
+  no dangling pointers.
+
+  Referential integrity requires that, whenever a
+  foreign key value is used it must reference a valid,
+  existing primary key in the parent table.
+
+  https://database.guide/what-is-referential-integrity/
+
+
+Interfaces
+----------
+Structured Query Language (SQL)
+
+  https://en.wikipedia.org/wiki/SQL
+
+Data Manipulation Language (DML)
+
+  Procedural: Specifies the high-level strategy to find
+  the desired result based on sets / bags.
+
+  Non-procedural (declarative): The query specifies
+  only what data is wanted and not how to find it.
+
+
+Operational issues
+------------------
+Database Sharding
+
+  https://www.youtube.com/watch?v=hdxdhCpgYo8
+
+Database Management System (DBMS)
+
+  Software used to interact with and manage the DB.
+
+  A general-purpose DBMS supports the definition,
+  creation, querying, update, and administration
+  of databases in accordance with some data model.
+
+
+Theory
+------
 Algebra (abstract algebra)
 
   An algebra is just a notation with rewrite rules.
@@ -159,22 +223,19 @@ Algebra (abstract algebra)
 
 Normalization
 
-  My first exposure to the term normalization comes
-  from the lambda calculus, which is an abstract
-  rewrite system.
-
-  In abstract rewriting systems an expression is in
-  normal form if it cannot be rewritten any further
-  using the rewrite rule under consideration.
-
   The idea of normalization is to take something and
   reduce it to its simplest form. This helps make the
   representation of the expression as compact as possible.
 
   https://en.wikipedia.org/wiki/Normal_form_(abstract_rewriting)
 
-  Databases do this, too. The aim is to reduce data
-  redundancy and improve data integrity.
+  In abstract rewrite systems, if something is fully
+  reduced according to some rewrite operation,
+  such as :math:`op`, then it is considered to be in
+  :math:`op`-normal form.
+
+  Databases do this, too. They have rewrite rules with the
+  aim of reducing data redundancy and improve data integrity.
 
   https://hackr.io/blog/dbms-normalization
 
@@ -238,7 +299,7 @@ Relational Algebra
     combines each row (tuple) of the first relation with each
     row (tuple) of the second relation.
 
-  * **Join** (⋈): Combines two relations (tables) 
+  * **Join** (⋈): Combines two relations (tables)
     based on a common attribute (column) to create a
     new relation that contains all columns (attributes)
     from both relations.
