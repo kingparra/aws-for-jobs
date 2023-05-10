@@ -52,8 +52,8 @@ Database types
 * Non-relational: MongoDB, Cassandra, Redis
 
 
-Relational Databses
--------------------
+Relational Databases
+--------------------
 The relational model is probably the most widely used.
 
 Relational DBs are ideal when you:
@@ -74,8 +74,8 @@ Non-relational is ideal when you:
 * Read/write rates exceed what can be economically supported through traditionsl RDBMS.
 
 
-Relational Databse Service
---------------------------
+Relational Database Service
+---------------------------
 What does using a managed service like RDS save you from?
 Backups, replication, HA, OS patching, hardware concerns.
 
@@ -91,14 +91,9 @@ Read replicas are read-only copies of your database that recieve updates from
 your master db asynchronously.
 
 
-Redis
------
-
-
-
 Aurora High Availability
 ------------------------
-Backups are continuous and incremental. They have a rentention period.
+Backups are continuous and incremental. They have a retention period.
 
 There are four components involved in backups, SSM, a service role for SSM,
 the RDS cluster, and a key used to encrypt everything.
@@ -112,3 +107,82 @@ It creates copies of the DB in six AZs, two copies per AZ.
 The DB cluster volume is backed by multiple copies.
 
 After a DB crash, aurora does not need to rebuild.
+
+
+DynamoDB
+--------
+Amazon DynamoDB is a fully managed, serverless,
+key-value NoSQL database designed to run
+high-performance applications at any scale.
+
+DynamoDB offers built-in security, continuous backups,
+automated multi-Region replication, in-memory caching,
+and data import and export tools.
+
+Scalability
+^^^^^^^^^^^
+Dynamo has insane horizontal scalability. Uptime is
+99.999% according to the SLA page. That's less than 5
+minutes of yearly downtime.
+
+SaaS
+^^^^
+DynamoDB is a SaaS offering, so you don't have access
+to the instances, and can't control it's networking
+like you can with RDS on VPC. The way permissions are
+handled is different, too. There isn't an internal
+permissions system, instead you manage it with IAM.
+DynamoDB integrates with with a other AWS services,
+too.
+
+Data modelling
+^^^^^^^^^^^^^^
+DynamoDB is best suited for data with known access
+patterns. Unknown access patterns may be suboptimal.
+
+The vocabulary for DynamoDB is different than
+relational databases.
+
+(Table ~= Table).
+(Item ~= Record).
+(Attribute ~= Column).
+
+In DynamoDB an attribute is a Key-Value pair.
+
+In DynamoDB the primary key is composed of a *partition
+key* and an optional *sort key*.
+
+Dynamo also has the option of creating a *global
+secondary index* or GSI to speed up lookups of other
+attributes.
+
+One thing to know about tales is that they are
+region-specific.
+
+Working with data
+^^^^^^^^^^^^^^^^^
+Databases in DynamoDB are not manipulated with SQL, but
+with APIs or ORMs, instead. You can also interact with
+it using the PartiQL editor in the web console. The
+datatypes in DynamoDB can potentially be much more
+complex than what is typically used in a relational
+database -- things like strings, bools, sorted sets,
+and complex objects in json form.
+
+
+Import / Export / Backups
+^^^^^^^^^^^^^^^^^^^^^^^^^
+You can import and export from S3. Read about backups
+yourself.
+
+Pricing
+^^^^^^^
+DynamoDB charges for reading, writing, and storing data
+in your DynamoDB tables, along with any optional
+features you choose to turn on. DynamoDB has on-demand
+capacity mode and provisioned capacity mode, and these
+modes have pricing for processing reads and writes on
+your tables.
+
+Provisioned capacity can be significantly less
+expensive than on-demand.
