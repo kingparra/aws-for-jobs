@@ -9,7 +9,8 @@ Questions
 
 Database Consideration
 ----------------------
-Which db or db service should you use? Here are some things to consider.
+Which db or db service should you use?
+Here are some things to consider.
 
 Scalability
 ^^^^^^^^^^^
@@ -29,6 +30,12 @@ Durability
 ^^^^^^^^^^
 * What level of data durablity, data availability, and recoverability is required?
 * Do regulatory obligations apply?
+
+A long-form explanation of which database to choose:
+`Databases on AWS: How to Choose
+<https://docs.aws.amazon.com/documentation/latest/
+databases-on-aws-how-to-choose/welcome.html>`_.
+
 
 Database Schema
 ---------------
@@ -71,7 +78,7 @@ Non-relational is ideal when you:
 
 * Must scale horizontally to handle massive data volume
 * The data may have inconsistent structure, or does lend itself well to traditional schemas
-* Read/write rates exceed what can be economically supported through traditionsl RDBMS.
+* Read/write rates exceed what can be economically supported through traditional RDBMS.
 
 
 Relational Database Service
@@ -87,7 +94,7 @@ Usually DBs are in a private subnet, and only exposed to particular EC2 instance
 
 RDS Read Replicas
 -----------------
-Read replicas are read-only copies of your database that recieve updates from
+Read replicas are read-only copies of your database that receive updates from
 your master db asynchronously.
 
 
