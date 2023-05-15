@@ -2,8 +2,12 @@
  Project 4
 ***********
 
+
+Problem description
+-------------------
+
 Part 1
-------
+^^^^^^
 Piotr our Database Base Administrator (DBA) has
 requested that we deploy a Linux EC2 instance for a
 development database. The team prefers to run this DB
@@ -40,7 +44,7 @@ following requirements
   (96.241.172.40)Project 4
 
 Part 2
-------
+^^^^^^
 Later on, Piotr requested some changes to the instance:
 
 * Resize the EBS volume to 30GB
@@ -56,3 +60,10 @@ Later on, Piotr requested some changes to the instance:
 * Take a snapshot of the volume after installing the DB (for safety)
 * Resize the partition (at the OS level)
 * Resize filesystem (at the OS level)
+
+
+Solution
+--------
+For this lab, I've done everything manually
+through the web console and recorded a screencast.
+I don't plan to automate this.
