@@ -5,7 +5,7 @@ Review Mega Project
 Problem Description
 -------------------
 You have been entrusted with the task of setting up a highly available web
-server on AWS for a prominent fitness compnay called Energym. The website
+server on AWS for a prominent fitness company called Energym. The website
 should be configured to exclusively accept HTTP.
 
 Upon successful deployment, take a snapshot of the EBS volume, and create a
@@ -13,7 +13,7 @@ golden AMI, laying the foundation for seamless future deployments. To ensure
 proper cost allocation, tag the server with the clients name.
 
 The website's code resides in a S3 bucket, ``s3://yt-websites-2023/energym-html``.
-It is highly reccomended that you throughly teset the AMI to ensure it meets
+It is highly recommend that you thoroughly test the AMI to ensure it meets
 the expected functionality.
 
 
@@ -21,10 +21,10 @@ Phase 1 - Work on your test server
 ----------------------------------
 * Create an instance profile (we need an IAM role so the EC2
   instance can copy the website files from an S3 bucket).
-* Create an instance, with type t2.micro, and attach the role.
+* Create an instance, with type ``t2.micro``, and attach the role.
 * Add 1 storage drive (root 16 GiB).
 * Make sure the server OS gets updated at deployment and install httpd.
-* Copy website code from s3 using userdata. ``s3://yt-websites-2023/energym-html/``
+* Copy website code from S3 using userdata. ``s3://yt-websites-2023/energym-html/``
 * Take the instance with ``Client=Energym``.
 * Test your ability to access the website.
 

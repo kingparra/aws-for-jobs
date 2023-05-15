@@ -1,3 +1,4 @@
+## Intended to come from terraform cloud variable set
 variable "aws_secret_access_key" {
   type = string
   sensitive = true

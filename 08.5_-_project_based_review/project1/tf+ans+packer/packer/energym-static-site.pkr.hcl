@@ -18,9 +18,13 @@ data "amazon-ami" "amzl" {
   region = "us-east-1"
 }
 
+# https://developer.hashicorp.com/packer/plugins/builders/amazon/ebs
 source "amazon-ebs" "amzl" {
   source_ami = data.amazon-ami.amzl.id
   ami_name = "EnergymGoldenImage"
+  tags = {
+    "Client" = "Energym"
+  }
   instance_type = "t2.micro"
   ssh_username = "ec2-user"
   ssh_timeout = "5m"
@@ -65,7 +69,8 @@ build {
       ## Yes, this arg is intended to be one long string.
       ## anything after the --ssh-extra-args argument
       ## gets passed verbatim to ssh, which does it's
-      ## own argument parsing.
+      ## own arg parsing. There are two level of arg
+      ## parsing.
       "-o IdentitiesOnly=yes -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa"
     ]
   }
