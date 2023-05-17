@@ -28,6 +28,22 @@ Resources
 aws_autoscalingplans_scaling_plan
 
 
+SQS
+---
+Resources
+^^^^^^^^^
+aws_sqs_queue
+aws_sqs_queue_policy
+aws_sqs_queue_redrive_allow_policy
+aws_sqs_queue_redrive_policy
+
+Data Sources
+^^^^^^^^^^^^
+aws_sqs_queue
+aws_sqs_queues
+
+
+
 
 CloudFormation
 **************
@@ -55,6 +71,11 @@ Resource types
 ^^^^^^^^^^^^^^
 AWS::ApplicationAutoScaling::ScalableTarget
 AWS::ApplicationAutoScaling::ScalingPolicy
+
+SQS
+---
+AWS::SQS::Queue
+AWS::SQS::QueuePolicy
 
 
 Awscli
