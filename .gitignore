@@ -57,3 +57,6 @@ cdk.out/
 # IDE crap
 **/.vscode
 .vscode
+
+# Draw.io diagram swap and backup files
+.$*.drawio.*
