@@ -40,7 +40,6 @@ resource "aws_ec2_tag" "igw_tag" {
   value       = "${local.prefix}-igw"
 }
 
-
 locals {
   prefix = "aurora-prod"
 }
