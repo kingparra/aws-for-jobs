@@ -4,7 +4,11 @@
 *.pdf
 *.docx
 
+# folder icons
+.icon.*
+
 # recordings from zoom and slack
+*zoom_recordings/*
 *.mp4
 *.m4a
 
