@@ -1,8 +1,5 @@
-/* TODO Get this working. InvalidSubnetConflict CIDR
- *
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
-
   name = "${local.prefix}-vpc"
   cidr = "10.0.0.0/16"
 
@@ -10,7 +7,7 @@ module "vpc" {
   # Like zip(azs, private_subnets); zip(azs, public_subnets) in python.
   azs = ["us-east-1a","us-east-1b"]
   private_subnets = ["10.0.1.0/26", "10.0.2.0/26"]
-  public_subnets  = ["10.0.3.0/25", "10.0.3.0/25"]
+  public_subnets  = ["10.0.3.0/25", "10.0.4.0/25"]
 
   # Default behaviour is one nat gateway per subnet.
   enable_nat_gateway = true
@@ -18,7 +15,7 @@ module "vpc" {
   one_nat_gateway_per_az = false
 
   # Control the default NACL associated with every subnet
-  # manage_default_network_acl = true
+  manage_default_network_acl = true
   # Use separte NACLs for the public subnets
   public_dedicated_network_acl = true
   # Use separte NACLs for the private subnets
@@ -37,7 +34,14 @@ module "vpc" {
   # TODO Name for the IGW
 }
 
+resource "aws_ec2_tag" "igw_tag" {
+  resource_id = module.vpc.igw_id
+  key         = "Name"
+  value       = "${local.prefix}-igw"
+}
+
+
 locals {
   prefix = "aurora-prod"
 }
-*/
+
