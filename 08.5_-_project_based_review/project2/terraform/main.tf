@@ -9,6 +9,9 @@ module "vpc" {
   private_subnets = ["10.0.1.0/26", "10.0.2.0/26"]
   public_subnets  = ["10.0.3.0/25", "10.0.4.0/25"]
 
+  # Set assign_public_ip_address = true for instances on the public subnets
+  map_public_ip_on_launch = true
+
   # Default behaviour is one nat gateway per subnet.
   enable_nat_gateway = true
   single_nat_gateway = true
