@@ -43,14 +43,14 @@ A schema is an outline of the architecture of a DB. It will help ensure the foll
 
 * Consistent formatting of data entries
 * All record entries have a unique primary key
-* No important data is ommitted
+* No important data is omitted
 
 What is in the schema:
 
 * Tables
 * Rows
 * Types of each row
-* Relationships between tables (forign keys, constraints)
+* Relationships between tables (foreign keys, constraints)
 
 
 Database types
