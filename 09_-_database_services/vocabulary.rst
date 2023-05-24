@@ -24,7 +24,8 @@ Data model
 Schema
 
   A description of a particular collection of data,
-  using a given data model.
+  using a given data model. A design for how the data
+  is organized or laid-out.
 
 Data Model
 
@@ -41,6 +42,9 @@ Data Model
     * Document/Object
     * Wide-column/Column-family
 
+  One common theme of non-relational data models is
+  that they are more relaxed about how schemas are
+  defined. They can often be manipulated on-the-fly.
 
 Relational databases
 --------------------
@@ -154,6 +158,12 @@ Primary Key
   A column (or multiple columns) that contains unique values
   that are used to identify a row. Each value is unique within
   the table and cannot be null.
+
+Composite Key
+
+  A key created by combining the contents of two or
+  more other keys. This must include the primary key,
+  and can contain any other keys, as well.
 
 Foreign Key
 
