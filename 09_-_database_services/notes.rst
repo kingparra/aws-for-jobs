@@ -160,8 +160,8 @@ In DynamoDB the primary key is composed of a *partition
 key* and an optional *sort key*. **You can't add a sort
 key after your primary key has been created.**
 
-Dynamo also has the option of creating a *global
-secondary index* or GSI to speed up lookups of other
+DynamoDB also has the option of creating a **global
+secondary index** or GSI to speed up lookups of other
 attributes.
 
 One thing to know about tables is that they are
@@ -170,13 +170,38 @@ region-specific.
 Working with data
 ^^^^^^^^^^^^^^^^^
 Databases in DynamoDB are not manipulated with SQL, but
-with APIs or ORMs, instead. You can also interact with
-it using the PartiQL editor in the web console. The
-datatypes in DynamoDB can potentially be much more
+with APIs or ORMs, instead.
+
+You can also interact with it using the PartiQL editor
+in the web console.
+
+The datatypes in DynamoDB can potentially be much more
 complex than what is typically used in a relational
 database -- things like strings, bools, sorted sets,
 and complex objects in json form.
 
+Queries and scans
+~~~~~~~~~~~~~~~~~
+There are two ways to query the DB: The **Query**
+operation, and the **Scan** operation.
+
+Query
+* Finds items based on primary key values
+* Inexpensive
+
+Scan
+* Finds items based on attributes in every item in a table.
+* Expensive
+
+Secondary indexes
+^^^^^^^^^^^^^^^^^
+Global secondary index
+
+  Totally different partition key and sort key.
+
+Local secondary index
+
+  Same partition key, different sort key.
 
 Import / Export / Backups
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -195,3 +220,5 @@ your tables.
 Provisioned capacity can be significantly less
 expensive than on-demand.
 
+Resources are measured in Write Capacity Units (WCUs)
+and Read Capacity Units (RCUs).
