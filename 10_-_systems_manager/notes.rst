@@ -109,7 +109,28 @@ Operations management
 ---------------------
 * Explorer
 * OpsCenter
-* CloudWatch Dsahboard
-* Incident Manager
+* CloudWatch dashboard
+* Incident manager
+
+OpsCenter
+^^^^^^^^^
+This service aggregates and normalizes messages about
+operational issues. These are called OpsItems.
+
+OpsItems come from many services, including AWS Config
+changes, CloudWatch Alarms, CloudFormation Stack
+information, and more.
 
 
+Application management
+----------------------
+* Application manager
+* AppConfig
+* Parameter store
+
+Application manager
+^^^^^^^^^^^^^^^^^^^
+It seems like this feature tries to group resources
+based on many criteria, so you can manage them as a
+unit. Once you have an "application", you can manage it
+as a group.
