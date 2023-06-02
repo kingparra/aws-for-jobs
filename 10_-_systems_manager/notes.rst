@@ -132,5 +132,116 @@ Application manager
 ^^^^^^^^^^^^^^^^^^^
 It seems like this feature tries to group resources
 based on many criteria, so you can manage them as a
-unit. Once you have an "application", you can manage it
-as a group.
+unit.
+
+Some possible criteria for grouping include: CloudFormation stack
+name, ECS cluster, EKS, or AWS Launch Wizard.
+
+
+Once you have an "application", you can manage it as a group.
+You can also view operations info on them.
+
+------- verbatim copy of the slides ----------------
+
+Helps you investigate and remediate issues with your resources in
+the context of your applications.
+
+You can discover and/or define you application components,
+view operations data in the context of an application,
+and perform remedial actions such as patching and running
+automation runbooks.
+
+You can use application manager to view operational data on your
+existing clusters in EKS clusters.
+
+An application is a logical group of resource that you want to
+operate on as a unit.
+
+When you choose get started, application manager automatically
+imports metadata about your resources that were created in other
+services or systems manager capabilities.
+
+Resources are displayed in the following predefined categories:
+
+* CloudFormation stacks
+* EKS clusters
+* launch wizard
+
+After import completes you can view operations information about
+your resources in these predefined application categories.
+
+..it turns out I can type at speaking speed...
+
+------------------------------------------------------------
+
+* Is Application Manager accessible from the command-line?
+
+* When would I use Application manager rather than creating a
+  custom dashboard on CloudWatch?
+
+* What is an OpsItem, really?
+
+
+AppConfig
+^^^^^^^^^
+AppConfig is a SaaS that lets you validate uploaded config files.
+Misconfiguration is a leading cause of outages, so validating
+config files is a valuable practice.
+
+I've been thinking about this for a while, and I think I'd like
+to see a rules system for config files that lets you define
+relationships between fragments of the config. Think "strongly
+typed AST for config files, with functions between the types
+defining relationships".
+
+Parameter Store
+^^^^^^^^^^^^^^^
+This is like HashiCorp vault. You can put sensitive info in here
+and it will let you assign permissions to it. You can view who
+accessed the info and when the accessed it. Access to sensitive
+info is through an API. This is useful for separating passwords
+and other sensitive details from your source code. Instead of
+hardcoding passwords or using environment variables, you place
+API calls to parameter store there.
+
+
+An example of creating a new parameter with awscli::
+
+  aws ssm put-parameter \
+    --name $n \
+    --value $v \
+    --type String \
+    --tags "Key=$tag_key,Value=$tag_value"
+
+.. topic:: How do I manage all this YAML?
+
+   I have been writing a *ton* of yaml lately.
+   Is there a meta-language I can use on top of it to provide typing rules?
+
+   I should look into JSONnet, Dhall, etc..
+
+Change management
+-----------------
+
+Automation
+^^^^^^^^^^
+Tabs: Executions, Integrations, Preferences.
+
+The SSM agent has it's own playbook format.
+You can use it to run commands, call API methods,
+or run python/powershell scripts.
+
+Automation has some change management features.
+You can schedule playbook execution in a maintenance window.
+You can require approvals for actions within the playbook.
+
+Components:
+
+* Automation book
+* Automation action
+* Automation quota
+* Automation queue quota
+* Rate control automation quota
+* Rate control automation queue quota
+
+Playbooks are SSM documents of type automation.
