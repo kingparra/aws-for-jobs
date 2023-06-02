@@ -213,13 +213,6 @@ An example of creating a new parameter with awscli::
     --type String \
     --tags "Key=$tag_key,Value=$tag_value"
 
-.. topic:: How do I manage all this YAML?
-
-   I have been writing a *ton* of yaml lately.
-   Is there a meta-language I can use on top of it to provide typing rules?
-
-   I should look into JSONnet, Dhall, etc..
-
 Change management
 -----------------
 
@@ -245,3 +238,19 @@ Components:
 * Rate control automation queue quota
 
 Playbooks are SSM documents of type automation.
+
+
+Node management
+---------------
+* Fleet manager
+* Compliance
+* Inventory
+* Hybrid activations
+* Session manager
+* Run command
+* State manager
+* Patch manager
+* Distributor
+
+The most useful services seem to be Run Command and Session Manager.
+Distributor is a way to install a payload on many nodes at once. Usually some form of agent.
