@@ -1,0 +1,245 @@
+# Template: ssm-howto-resources.yaml
+# Purpose:  CloudFormation template to deploy test resources for the Getting Started with SSM.
+#
+# Resources Created:
+#
+# * VPC, subnet, route table, security group, and internet gateway for EC2 instances
+# * Two s3 buckets
+# * Four Amazon Linux 2 instances
+#
+# Clean-up Steps:
+# 1. Delete the CloudFormation Stack
+#
+#------------------------------------------------------------------------------
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS CloudFormation template to deploy test resources for the Getting Started with SSM.
+
+#-----------------------------------------------------------
+# Parameters
+#-----------------------------------------------------------
+Parameters:
+  LatestAmazonLinux2AmiId:
+    # Use public Systems Manager Parameter
+    Type : AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+  MainRegion:
+    Type: String
+    Description: Main region for IAM.
+    Default: us-east-1
+
+Resources:
+  #-------------------------------------------------
+  # VPC and required resources to enable network connectivity to AWS Systems Manager
+  #-------------------------------------------------
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Workload
+          Value: ssm-howto
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Workload
+          Value: ssm-howto
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+  SubnetPublic:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [0, !GetAZs '']
+      CidrBlock: 10.0.0.0/20
+      MapPublicIpOnLaunch: true
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Workload
+          Value: ssm-howto
+  RouteTablePublic:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Workload
+          Value: ssm-howto
+  RouteTableAssociationPublic:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref SubnetPublic
+      RouteTableId: !Ref RouteTablePublic
+  RouteTablePublicInternetRoute:
+    Type: AWS::EC2::Route
+    DependsOn: VPCGatewayAttachment
+    Properties:
+      RouteTableId: !Ref RouteTablePublic
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+  NetworkAclPublic:
+    Type: AWS::EC2::NetworkAcl
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Workload
+          Value: ssm-howto
+  SubnetNetworkAclAssociationPublic:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      SubnetId: !Ref SubnetPublic
+      NetworkAclId: !Ref NetworkAclPublic
+  NetworkAclEntryInPublicAllowAll:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      NetworkAclId: !Ref NetworkAclPublic
+      RuleNumber: 100
+      Protocol: -1
+      RuleAction: allow
+      Egress: false
+      CidrBlock: 0.0.0.0/0
+  NetworkAclEntryOutPublicAllowAll:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      NetworkAclId: !Ref NetworkAclPublic
+      RuleNumber: 100
+      Protocol: -1
+      RuleAction: allow
+      Egress: true
+      CidrBlock: 0.0.0.0/0
+  WebInstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Web Security Group for SSM Workshop test instances
+      GroupName: ssm-howto-CF-Web
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref VPC
+
+  #-------------------------------------------------
+  # Four Amazon Linux 2 EC2 instances using the latest AMI for Amazon Linux 2
+  #-------------------------------------------------
+  LinuxEc2InstanceOne:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: !Ref LatestAmazonLinux2AmiId
+      Monitoring: true
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: "true"
+          DeviceIndex: "0"
+          GroupSet:
+            - Ref: WebInstanceSecurityGroup
+          SubnetId:
+            Ref: SubnetPublic
+      Tags:
+        - Key: Name
+          Value: Editorial-dev
+        - Key: Patch
+          Value: 'true'
+  LinuxEc2InstanceTwo:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: !Ref LatestAmazonLinux2AmiId
+      Monitoring: true
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: "true"
+          DeviceIndex: "0"
+          GroupSet:
+            - Ref: WebInstanceSecurityGroup
+          SubnetId:
+            Ref: SubnetPublic
+      Tags:
+        - Key: Name
+          Value: Editorial-dev
+        - Key: Patch
+          Value: 'true'
+  LinuxEc2InstanceThree:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: !Ref LatestAmazonLinux2AmiId
+      Monitoring: true
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: "true"
+          DeviceIndex: "0"
+          GroupSet:
+            - Ref: WebInstanceSecurityGroup
+          SubnetId:
+            Ref: SubnetPublic
+      Tags:
+        - Key: Name
+          Value: Editorial-prod
+        - Key: Patch
+          Value: 'true'
+  LinuxEc2InstanceFour:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: !Ref LatestAmazonLinux2AmiId
+      Monitoring: true
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: "true"
+          DeviceIndex: "0"
+          GroupSet:
+            - Ref: WebInstanceSecurityGroup
+          SubnetId:
+            Ref: SubnetPublic
+      Tags:
+        - Key: Name
+          Value: Editorial-prod
+        - Key: Patch
+          Value: 'true'
+
+#-------------------------------------------------
+# Bucket used to store instance command logs
+#-------------------------------------------------
+  EditorialDevBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ssm-howto-dev-${AWS::Region}-${AWS::AccountId}
+      AccessControl: BucketOwnerFullControl
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Name
+          Value: Editorial-dev
+
+  EditorialProdBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ssm-howto-prod-${AWS::Region}-${AWS::AccountId}
+      AccessControl: BucketOwnerFullControl
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Name
+          Value: Editorial-prod
