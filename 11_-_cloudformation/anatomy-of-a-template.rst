@@ -6,6 +6,7 @@ Each section contains different categories of information.
 A section roughly corresponds to a type of terraform block.
 
 If you want to read the YAML spec, here it is: https://yaml.org/spec/1.2.2/
+Here is a cheat-sheet https://learnxinyminutes.com/docs/yaml/.
 
 Sections:
 
@@ -39,8 +40,8 @@ Here's an example of a parameter definition::
 
 Each parameter definition corresponds to a web form that the user can fill out.
 
-To use a variable, you can't just access the name.
-You have to deference the value of a parameter, use the ref function.
+To use a variable, you can't access the name directly.
+You have to deference the value of a parameter, using the ref function.
 ::
 
   !Ref ParameterName
@@ -100,8 +101,8 @@ Here's are two example rules, to give you an idea of their structure.
               - ''
           AssertDescription: Route53 Hosted Zone Name is mandatory when SSL is required
 
-The assertion is a mandatory part of a rule. The rule-condition determines when to evaluate a rule,
-and it is optional.
+The assertion is a mandatory part of a rule.
+The optional rule-condition determines when to evaluate a rule.
 
 
 Mappings

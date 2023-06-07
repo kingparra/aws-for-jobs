@@ -69,7 +69,7 @@ Realistically, I wouldn't. Unrealistically, here are
 some technically sound arguments.
 
 * It's possible to set up one-click deployments with CF.
-* CF tempaltes can be distributed on the AWS marketplace, whereas Terraform cannot.
+* CF templates can be distributed on the AWS marketplace, whereas Terraform cannot.
 * Anyone who has a SysOps Associate cert most likely knows some CloudFormation.
 * CloudFormation has a graphical editor called Designer that seems
   nice for doing visual presentations of network topologies. (There
@@ -108,10 +108,20 @@ How do I emulate the terraform cli workflow using CloudFormation?
 ::
 
   # terraform init
-  aws cloudformation create-stack --stack-name $s --template-body "$(cat $file)"
+  aws cloudformation create-stack --stack-name $s --template-body file://$path \
+      --parameters ParameterKey=Parm1,ParameterValue=test1 \
+                   ParameterKey=Parm2,ParameterValue=test2
 
   # terraform plan
-  aws cloudformation create-change-set --stack-name $s --change-set-name $c --template-body "$(cat $file)"
+  aws cloudformation create-change-set --stack-name $s --change-set-name $c --template-body file://$path
 
   # terraform apply
   aws cloudformation deploy --stack-name $s --template-name $t
+
+  # terraform workspace list
+  aws cloudformation list-stacks
+
+  # terraform state list
+  aws cloudformation list-stack-resources --stack-name $s
+
+For a lengthier description, see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-using-cli.html
