@@ -2,6 +2,12 @@
  Systems Manager
 *****************
 
+Read me first
+-------------
+These notes are garbage, and I don't understand how to use Systems Manager.
+I couldn't get any of the examples to work outside of class.
+I'm going to move on and revisit this one later.
+
 
 First glance at Systems Manager
 -------------------------------
@@ -36,15 +42,8 @@ Questions
 * What are the most frequently used features of SSM?
 * What tasks will I most likely be asked to perform through SSM?
 * What should I care about?
-
 * Why would I use SSM instead of an equivalent (or better!)
   software package for whichever feature I'm interested in.
-
-  It seems like there are things for each of these packages.
-
-  One possible advantage of SSM is that it can draw from
-  many AWS services. But I wonder about the pricing.
-
 
 What is systems manager?
 ------------------------
@@ -188,12 +187,6 @@ AppConfig is a SaaS that lets you validate uploaded config files.
 Misconfiguration is a leading cause of outages, so validating
 config files is a valuable practice.
 
-I've been thinking about this for a while, and I think I'd like
-to see a rules system for config files that lets you define
-relationships between fragments of the config. Think "strongly
-typed AST for config files, with functions between the types
-defining relationships".
-
 Parameter Store
 ^^^^^^^^^^^^^^^
 This is like HashiCorp vault. You can put sensitive info in here
@@ -253,4 +246,44 @@ Node management
 * Distributor
 
 The most useful services seem to be Run Command and Session Manager.
+
 Distributor is a way to install a payload on many nodes at once. Usually some form of agent.
+Examples include CW agent, AwsPvDriver (paravirtualization driver).
+
+Shared resources
+----------------
+* Documents
+
+Documents
+^^^^^^^^^
+Types of documents:
+
+* Command document - state manager, automation, maint windows
+* Automation document - state manager, automation, maint windows
+* Package document - used with distributor
+* Session document - session manager
+* Policy document - state manager
+* Change calendar document - change calendar
+* CloudFormation template
+
+Actions you can take with documents:
+
+* version
+* view
+* customize
+* tag
+* share
+
+::
+
+  aws ssm send-command \
+  --document-name "DockerInstall" \
+  --document-version "1" \
+  --targets '[{"Key":"resource-groups:Name","Values":["dev-group"]}]' \
+  --parameters '{}' \
+  --comment "Install docker on dev group machines." \
+  --timeout-seconds 600 \
+  --max-concurrency "50" \
+  --max-errors "0" \
+  --output-s3-bucket-name "ssm-howto-dev-us-east-1-972171577695" \
+  --region us-east-1
