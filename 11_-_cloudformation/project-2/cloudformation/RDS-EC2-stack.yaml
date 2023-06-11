@@ -131,7 +131,6 @@ Resources:
         sudo sed -i "s/dbname/${DBNAME}/g" /var/www/inc/dbinfo.inc
       Tags:
         - Key: PHPAPP-server-1
-      DependsOn: [AppInstanceProfile]
 
   RDSInstance:
     Type: AWS::RDS::DBInstance
