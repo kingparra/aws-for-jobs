@@ -1,16 +1,26 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Template to Create an RDS instance and an EC2 instance
-
+Description: Template to create an RDS instance and an EC2 instance
 Parameters:
 
-  VpcId:
+  Vpc:
     Type: AWS::EC2::VPC::Id
+    Default: vpc-0ecf11b5ae771cd60
+
+  KeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Default: mod11project2
 
   PrivateSubnet1Id:
     Type: AWS::EC2::Subnet::Id
+    Default: subnet-0bab586eaae2b9242
 
   PrivateSubnet2Id:
     Type: AWS::EC2::Subnet::Id
+    Default: subnet-0b8e0e1dc52653e89
+
+  PublicSubnet1Id:
+    Type: AWS::EC2::Subnet::Id
+    Default: subnet-0b1d49354863152b3
 
   DBName:
     Type: String
@@ -26,9 +36,12 @@ Parameters:
     Default: abcd1234
 
   LatestAmiId:
-    Description: Gets the latest AMI from Systems Manager Parameter store
-    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
-    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+    Description: Get the latest AMI from System Manager Parameters store
+    # Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    # Default: '/aws/service/ami-linux-latest/amzn2-hvm-x86_64-gp2'
+    # Getting IAM permissions error for lookup
+    Type: AWS::EC2::Image::Id
+    Default: ami-0c503d55a14d7a5f0
 
 Resources:
 
@@ -38,7 +51,7 @@ Resources:
       Name: /student/masterpassword
       Type: String
       Value: !Ref DBPass
-      Description: Password of a DB admin user
+      Description: Password of DB admin user
 
   DBNAMEParameter:
     Type: AWS::SSM::Parameter
@@ -56,16 +69,7 @@ Resources:
       Value: !Ref DBUser
       Description: Admin username
 
-  ENDPOINTParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: /student/endpoint
-      Type: String
-      Value: !GetAtt RDSInstance.Endpoint.Address
-      Description: Endpoint of our DB
-    DependsOn: RDSInstance
-
-  Ec2SsmIamRole:
+  EC2SsmIamRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -73,19 +77,20 @@ Resources:
           - Effect: Allow
             Principal:
               Service: [ec2.amazonaws.com]
-            Action: ['sts:AssumeRole']
+            Action: [sts:AssumeRole]
       Path: /
       ManagedPolicyArns:
-        - arn:aws:iam:aws:policy/AmazonSSMFullAccess
-        - arn:aws:iam:aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/amazonSSMFullAccess
+        - arn:aws:iam::aws:policy/amazonS3FullAccess
 
   AppInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
       InstanceProfileName: ssm-ec2-instance-profile
       Path: /
-      Role:
-        - !Ref Ec2SsmIamRole
+      Roles:
+        - !Ref EC2SsmIamRole
+    DependsOn: [EC2SsmIamRole]
 
   AppInstance:
     Type: AWS::EC2::Instance
@@ -93,10 +98,10 @@ Resources:
       ImageId: !Ref LatestAmiId
       InstanceType: t2.micro
       AvailabilityZone: us-east-1a
-      KeyName: ProjectKeypair
+      KeyName: !Ref KeyPairName
       SecurityGroupIds:
         - !Ref AppNodeSG
-      SubnetId: subnet-0cd7525d796c0306a
+      SubnetId: !Ref PublicSubnet1Id
       IamInstanceProfile: !Ref AppInstanceProfile
       UserData: !Base64 |
         #!/bin/bash
@@ -104,26 +109,29 @@ Resources:
         sudo yum install -y httpd
         sudo systemctl start httpd
         sudo systemctl enable httpd
+
         sudo usermod -a -G apache ec2-user
         sudo chown -R ec2-user:apache /var/www
         sudo chmod 2775 /var/www
         sudo find /var/www -type d -exec sudo chmod 2775 {} \;
         sudo find /var/www -type f -exec sudo chmod 0664 {} \;
         sudo mkdir /var/www/inc
+
         DBPASS=$(aws ssm get-parameter --name /student/masterpassword --region us-east-1 --query "Parameter.Value" --output text)
         DBENDP=$(aws ssm get-parameter --name /student/endpoint --region us-east-1 --query "Parameter.Value" --output text)
         DBUSER=$(aws ssm get-parameter --name /student/dbuser --region us-east-1 --query "Parameter.Value" --output text)
         DBNAME=$(aws ssm get-parameter --name /student/dbname --region us-east-1 --query "Parameter.Value" --output text)
-        sudo aws s3 cp s3://mod11-project1-curly-dolphin-soup-alligator/dbinfo.inc /var/www/inc/   # <------ change bucket name DONE
+
+        sudo aws s3 cp s3://mod11-project1-curly-dolphin-soup-alligator/dbinfo.inc /var/www/inc/
+        sudo aws s3 cp s3://mod11-project1-curly-dolphin-soup-alligator/SamplePage.php /var/www/html/
+
         sudo sed -i "s/endpoint/${DBENDP}/g" /var/www/inc/dbinfo.inc
         sudo sed -i "s/user/${DBUSER}/g" /var/www/inc/dbinfo.inc
         sudo sed -i "s/password/${DBPASS}/g" /var/www/inc/dbinfo.inc
         sudo sed -i "s/dbname/${DBNAME}/g" /var/www/inc/dbinfo.inc
-        sudo aws s3 cp s3://mod11-project1-curly-dolphin-soup-alligator/SamplePage.php /var/www/html/  # <------ change bucket name DONE
       Tags:
-        - Key: Name
-          Value: PHPAPP-server1
-      DependsOn: RDSInstance
+        - Key: PHPAPP-server-1
+      DependsOn: [AppInstanceProfile]
 
   RDSInstance:
     Type: AWS::RDS::DBInstance
@@ -133,49 +141,50 @@ Resources:
       MasterUserPassword: !Ref DBPass
       Engine: MySQL
       DBInstanceClass: db.t2.micro
-      AllocatedStorage: "5"
+      AllocatedStorage: '5'
       VPCSecurityGroups:
         - !Ref DBSecurityGroup
-      DBInstanceIdentifier: !Join ["-", ["RDSInstance", !Ref "AWS::Region"]]
-      AvailabilityZone: !Select [0, !GetAZs ""]
-      DBSubnetGroupName: DBSubnets
+      DBInstanceIdentifier: RDSInstance
+  #    AvailabilityZone: us-east-1a
+      DBSubnetGroupName: !Ref DBSubnetG
 
   AppNodeSG:
-    Type: 'AWS::EC2::SecurityGroup'
+    Type: AWS::EC2::SecurityGroup
     Properties:
-      VpcId: !Ref VpcId
-      GroupDescription: SG to allow SSH and HTTP access
+      VpcId: !Ref Vpc
+      GroupDescription: SG to allow SSH access and HTTP access
       SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: '0.0.0.0/0'
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
-          CidrIp: '0.0.0.0/0'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
 
   DBSecurityGroup:
-    Type: 'AWS::EC2::SecurityGroup'
+    Type: AWS::EC2::SecurityGroup
     Properties:
-      VpcId: !Ref VpcId
-      GroupDescription: Allow to communicate with DB
+      VpcId: !Ref Vpc
+      GroupDescription: SG to allow communication with DB
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 3306
           ToPort: 3306
           SourceSecurityGroupId: !Ref AppNodeSG
 
-  DBsubnetG:
-    Type: 'AWS::RDS::DBSubnetGroup'
+  DBSubnetG:
+    Type: AWS::RDS::DBSubnetGroup
     Properties:
-      DBSubnetGroupDescription: DB subnets to use
+      DBSubnetGroupDescription: DB Subnets to use
       DBSubnetGroupName: DBSubnets
       SubnetIds:
         - !Ref PrivateSubnet1Id
         - !Ref PrivateSubnet2Id
 
 Outputs:
+
   URL:
     Description: URL of the website
-    Value: !Join ['', [!GetAtt AppInstance.PublicIp, /, 'SamplePage.php']]
+    Value: !Join ['', [!GetAtt AppInstance.PublicIp,/,SamplePage.php]]
