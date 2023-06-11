@@ -81,14 +81,14 @@ Resources:
         - arn:aws:iam::aws:policy/amazonSSMFullAccess
         - arn:aws:iam::aws:policy/amazonS3FullAccess
 
-  # AppInstanceProfile:
-  #   Type: AWS::IAM::InstanceProfile
-  #   Properties:
-  #     InstanceProfileName: ssm-ec2-instance-profile
-  #     Path: /
-  #     Roles:
-  #       - !Ref EC2SsmIamRole
-  #   DependsOn: [EC2SsmIamRole]
+  AppInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: ssm-ec2-instance-profile
+      Path: /
+      Roles:
+        - !Ref EC2SsmIamRole
+
 
   # AppInstance:
   #   Type: AWS::EC2::Instance
@@ -159,16 +159,16 @@ Resources:
           ToPort: 22
           CidrIp: 0.0.0.0/0
 
-  # DBSecurityGroup:
-  #   Type: AWS::EC2::SecurityGroup
-  #   Properties:
-  #     VpcId: !Ref Vpc
-  #     GroupDescription: SG to allow communication with DB
-  #     SecurityGroupIngress:
-  #       - IpProtocol: tcp
-  #         FromPort: 3306
-  #         ToPort: 3306
-  #         SourceSecurityGroupId: !Ref AppNodeSG
+  DBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref Vpc
+      GroupDescription: SG to allow communication with DB
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !Ref AppNodeSG
 
   # DBSubnetG:
   #   Type: AWS::RDS::DBSubnetGroup
