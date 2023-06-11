@@ -1,4 +1,3 @@
-AWSTemplateFormatVersion: '2010-09-09'
 Description: Template to create an RDS instance and an EC2 instance
 Parameters:
 
@@ -83,69 +82,68 @@ Resources:
         - arn:aws:iam::aws:policy/amazonSSMFullAccess
         - arn:aws:iam::aws:policy/amazonS3FullAccess
 
-  AppInstanceProfile:
-    Type: AWS::IAM::InstanceProfile
-    Properties:
-      InstanceProfileName: ssm-ec2-instance-profile
-      Path: /
-      Roles:
-        - !Ref EC2SsmIamRole
-    DependsOn: [EC2SsmIamRole]
+  # AppInstanceProfile:
+  #   Type: AWS::IAM::InstanceProfile
+  #   Properties:
+  #     InstanceProfileName: ssm-ec2-instance-profile
+  #     Path: /
+  #     Roles:
+  #       - !Ref EC2SsmIamRole
+  #   DependsOn: [EC2SsmIamRole]
 
-  AppInstance:
-    Type: AWS::EC2::Instance
-    Properties:
-      ImageId: !Ref LatestAmiId
-      InstanceType: t2.micro
-      AvailabilityZone: us-east-1a
-      KeyName: !Ref KeyPairName
-      SecurityGroupIds:
-        - !Ref AppNodeSG
-      SubnetId: !Ref PublicSubnet1Id
-      IamInstanceProfile: !Ref AppInstanceProfile
-      UserData: !Base64 |
-        #!/bin/bash
-        sudo amazon-linux-extras install -y lamp-mariadb10.2-php7.2 php7.2
-        sudo yum install -y httpd
-        sudo systemctl start httpd
-        sudo systemctl enable httpd
+  # AppInstance:
+  #   Type: AWS::EC2::Instance
+  #   Properties:
+  #     ImageId: !Ref LatestAmiId
+  #     InstanceType: t2.micro
+  #     KeyName: !Ref KeyPairName
+  #     SecurityGroupIds:
+  #       - !Ref AppNodeSG
+  #     SubnetId: !Ref PublicSubnet1Id
+  #     IamInstanceProfile: !Ref AppInstanceProfile
+  #     UserData: !Base64 |
+  #       #!/bin/bash
+  #       sudo amazon-linux-extras install -y lamp-mariadb10.2-php7.2 php7.2
+  #       sudo yum install -y httpd
+  #       sudo systemctl start httpd
+  #       sudo systemctl enable httpd
 
-        sudo usermod -a -G apache ec2-user
-        sudo chown -R ec2-user:apache /var/www
-        sudo chmod 2775 /var/www
-        sudo find /var/www -type d -exec sudo chmod 2775 {} \;
-        sudo find /var/www -type f -exec sudo chmod 0664 {} \;
-        sudo mkdir /var/www/inc
+  #       sudo usermod -a -G apache ec2-user
+  #       sudo chown -R ec2-user:apache /var/www
+  #       sudo chmod 2775 /var/www
+  #       sudo find /var/www -type d -exec sudo chmod 2775 {} \;
+  #       sudo find /var/www -type f -exec sudo chmod 0664 {} \;
+  #       sudo mkdir /var/www/inc
 
-        DBPASS=$(aws ssm get-parameter --name /student/masterpassword --region us-east-1 --query "Parameter.Value" --output text)
-        DBENDP=$(aws ssm get-parameter --name /student/endpoint --region us-east-1 --query "Parameter.Value" --output text)
-        DBUSER=$(aws ssm get-parameter --name /student/dbuser --region us-east-1 --query "Parameter.Value" --output text)
-        DBNAME=$(aws ssm get-parameter --name /student/dbname --region us-east-1 --query "Parameter.Value" --output text)
+  #       DBPASS=$(aws ssm get-parameter --name /student/masterpassword --region us-east-1 --query "Parameter.Value" --output text)
+  #       DBENDP=$(aws ssm get-parameter --name /student/endpoint --region us-east-1 --query "Parameter.Value" --output text)
+  #       DBUSER=$(aws ssm get-parameter --name /student/dbuser --region us-east-1 --query "Parameter.Value" --output text)
+  #       DBNAME=$(aws ssm get-parameter --name /student/dbname --region us-east-1 --query "Parameter.Value" --output text)
 
-        sudo aws s3 cp s3://mod11-project1-curly-dolphin-soup-alligator/dbinfo.inc /var/www/inc/
-        sudo aws s3 cp s3://mod11-project1-curly-dolphin-soup-alligator/SamplePage.php /var/www/html/
+  #       sudo aws s3 cp s3://mod11-project1-curly-dolphin-soup-alligator/dbinfo.inc /var/www/inc/
+  #       sudo aws s3 cp s3://mod11-project1-curly-dolphin-soup-alligator/SamplePage.php /var/www/html/
 
-        sudo sed -i "s/endpoint/${DBENDP}/g" /var/www/inc/dbinfo.inc
-        sudo sed -i "s/user/${DBUSER}/g" /var/www/inc/dbinfo.inc
-        sudo sed -i "s/password/${DBPASS}/g" /var/www/inc/dbinfo.inc
-        sudo sed -i "s/dbname/${DBNAME}/g" /var/www/inc/dbinfo.inc
-      Tags:
-        - Key: PHPAPP-server-1
+  #       sudo sed -i "s/endpoint/${DBENDP}/g" /var/www/inc/dbinfo.inc
+  #       sudo sed -i "s/user/${DBUSER}/g" /var/www/inc/dbinfo.inc
+  #       sudo sed -i "s/password/${DBPASS}/g" /var/www/inc/dbinfo.inc
+  #       sudo sed -i "s/dbname/${DBNAME}/g" /var/www/inc/dbinfo.inc
+  #     Tags:
+  #       - Key: Name
+  #         Value: PHPAPP-server-1
 
-  RDSInstance:
-    Type: AWS::RDS::DBInstance
-    Properties:
-      DBName: !Ref DBName
-      MasterUsername: !Ref DBUser
-      MasterUserPassword: !Ref DBPass
-      Engine: MySQL
-      DBInstanceClass: db.t2.micro
-      AllocatedStorage: '5'
-      VPCSecurityGroups:
-        - !Ref DBSecurityGroup
-      DBInstanceIdentifier: RDSInstance
-  #    AvailabilityZone: us-east-1a
-      DBSubnetGroupName: !Ref DBSubnetG
+  # RDSInstance:
+  #   Type: AWS::RDS::DBInstance
+  #   Properties:
+  #     DBName: !Ref DBName
+  #     MasterUsername: !Ref DBUser
+  #     MasterUserPassword: !Ref DBPass
+  #     Engine: MySQL
+  #     DBInstanceClass: db.t2.micro
+  #     AllocatedStorage: '5'
+  #     VPCSecurityGroups:
+  #       - !Ref DBSecurityGroup
+  #     DBInstanceIdentifier: RDSInstance
+  #     DBSubnetGroupName: !Ref DBSubnetG
 
   AppNodeSG:
     Type: AWS::EC2::SecurityGroup
