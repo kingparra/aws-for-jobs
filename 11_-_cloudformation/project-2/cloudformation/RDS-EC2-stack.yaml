@@ -36,11 +36,10 @@ Parameters:
 
   LatestAmiId:
     Description: Get the latest AMI from System Manager Parameters store
-    # Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
-    # Default: '/aws/service/ami-linux-latest/amzn2-hvm-x86_64-gp2'
-    # Getting IAM permissions error for lookup
-    Type: AWS::EC2::Image::Id
-    Default: ami-0c503d55a14d7a5f0
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+    # Type: AWS::EC2::Image::Id
+    # Default: ami-0c503d55a14d7a5f0
 
 Resources:
 
@@ -160,28 +159,28 @@ Resources:
           ToPort: 22
           CidrIp: 0.0.0.0/0
 
-  DBSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      VpcId: !Ref Vpc
-      GroupDescription: SG to allow communication with DB
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 3306
-          ToPort: 3306
-          SourceSecurityGroupId: !Ref AppNodeSG
+  # DBSecurityGroup:
+  #   Type: AWS::EC2::SecurityGroup
+  #   Properties:
+  #     VpcId: !Ref Vpc
+  #     GroupDescription: SG to allow communication with DB
+  #     SecurityGroupIngress:
+  #       - IpProtocol: tcp
+  #         FromPort: 3306
+  #         ToPort: 3306
+  #         SourceSecurityGroupId: !Ref AppNodeSG
 
-  DBSubnetG:
-    Type: AWS::RDS::DBSubnetGroup
-    Properties:
-      DBSubnetGroupDescription: DB Subnets to use
-      DBSubnetGroupName: DBSubnets
-      SubnetIds:
-        - !Ref PrivateSubnet1Id
-        - !Ref PrivateSubnet2Id
+  # DBSubnetG:
+  #   Type: AWS::RDS::DBSubnetGroup
+  #   Properties:
+  #     DBSubnetGroupDescription: DB Subnets to use
+  #     DBSubnetGroupName: DBSubnets
+  #     SubnetIds:
+  #       - !Ref PrivateSubnet1Id
+  #       - !Ref PrivateSubnet2Id
 
-Outputs:
+# Outputs:
 
-  URL:
-    Description: URL of the website
-    Value: !Join ['', [!GetAtt AppInstance.PublicIp,/,SamplePage.php]]
+#   URL:
+#     Description: URL of the website
+#     Value: !Join ['', [!GetAtt AppInstance.PublicIp, /, SamplePage.php]]
