@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "ebtest"
+version = "0.1.0"
+description = ""
+authors = ["Chris King-Parra <chris@kingparra.work>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+awsebcli = "^3.20.6"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
