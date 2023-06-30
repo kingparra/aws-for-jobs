@@ -29,10 +29,15 @@ resource "aws_lambda_function" "lambda" {
   role = aws_iam_role.iam_for_lambda.arn
 }
 
-/*
 resource "aws_apigatewayv2_api" "lambda_gw" {
-  name = "example-http-api"
+  name = "yt-website-api"
   protocol_type = "HTTP"
-  # cors_configuration = ... https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-cors.html
+  # Connected to function here!
+  target = aws_lambda_function.lambda.arn
+  # https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-cors.html
+  cors_configuration {
+    allow_origins = ["*"]
+    allow_methods = ["*"]
+    allow_headers = ["content-type"]
+  }
 }
-*/
