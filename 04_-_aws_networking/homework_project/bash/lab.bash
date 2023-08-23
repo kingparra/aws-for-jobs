@@ -125,7 +125,7 @@ getEip() {
 ###########################
 attachMyIgw() {
   aws \
-    --profile yellowtail ec2 attach-internet-gateway \
+    ec2 attach-internet-gateway \
     --vpc-id "$1" \
     --internet-gateway-id "$2"
 }
@@ -140,9 +140,19 @@ attachMyIgwToMyVpc() {
 
 # Configure route tables
 ########################
-# I did this by hand using the web UI.
-# Will update this after I have a better understanding of what's involved.
 
+# createRouteTable :: RouteTableName -> IO (CreateRouteTable RouteTable)
+createRouteTable() {
+  name=$1
+  aws ec2 create-route-table \
+    --vpc-id \
+      "$(aws ec2 describe-vpcs \
+          --query \
+            "Vpcs[?(Tags[?Key=='Name'].Value | [0]) == 'my-vpc'].VpcId" \
+          --output text)" \
+    --tag-specifications \
+      "ResourceType='route-table',Tags=[{Key='Name',Value='$name'}]"
+}
 
 
 
@@ -158,7 +168,7 @@ getLatestAmzLinuxAMI() {
 
 
 createMySg() {
-  aws --profile yellowtail ec2 create-security-group \
+  aws ec2 create-security-group \
     --group-name SG-bastion \
     --description "Enter SG for bastion host. SSH access only." \
     --vpc-id vpc-0a711d28c7f1aecaa \
