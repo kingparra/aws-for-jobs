@@ -126,13 +126,15 @@ getEip() {
 attachMyIgw() {
   aws \
     ec2 attach-internet-gateway \
-    --vpc-id "$1" \
-    --internet-gateway-id "$2"
-}
-
-
-attachMyIgwToMyVpc() {
-  attachMyIgw vpc-0a711d28c7f1aecaa igw-0c3927f792b21cd3a
+    --vpc-id \
+      "$(aws ec2 describe-vpcs \
+          --query "Vpcs[?(Tags[?Key=='Name'].Value | [0]) == 'my-vpc'].VpcId" \
+          --output text)" \
+    --internet-gateway-id \
+       "$(aws ec2 describe-internet-gateways \
+          --filters "Name='tag:Name',Values='my-internet-gateway'" \
+          --query "InternetGateways[].InternetGatewayId" \
+          --output text)"
 }
 
 
@@ -143,7 +145,6 @@ attachMyIgwToMyVpc() {
 
 # createRouteTable :: RouteTableName -> IO (CreateRouteTable RouteTable)
 createRouteTable() {
-  name=$1
   aws ec2 create-route-table \
     --vpc-id \
       "$(aws ec2 describe-vpcs \
@@ -151,9 +152,23 @@ createRouteTable() {
             "Vpcs[?(Tags[?Key=='Name'].Value | [0]) == 'my-vpc'].VpcId" \
           --output text)" \
     --tag-specifications \
-      "ResourceType='route-table',Tags=[{Key='Name',Value='$name'}]"
+      "ResourceType='route-table',Tags=[{Key='Name',Value='my-vpc-public-rt'}]"
 }
 
+createRoute() {
+  aws ec2 create-route \
+    --route-table-id \
+      "$(aws ec2 describe-route-tables \
+          --query \
+"RouteTables[?(Tags[?Key=='Name'].Value | [0]) == 'my-vpc-public-rt'].RouteTableId" \
+          --output text)" \
+    --destination-cidr-block 0.0.0.0/0 \
+    --gateway-id \
+       "$(aws ec2 describe-internet-gateways \
+          --filters "Name='tag:Name',Values='my-internet-gateway'" \
+          --query "InternetGateways[].InternetGatewayId" \
+          --output text)"
+}
 
 
 
