@@ -1,0 +1,14 @@
+/usr/include/stdc-predef.h:
+  hash: cb08cd5d4cc059a90833ac48a284d25016e8d56ded8ad4cd98d8ac59cc5053f3
+? /var/home/chris/.stack/programs/x86_64-linux/ghc-tinfo6-9.6.2/lib/ghc-9.6.2/lib/x86_64-linux-ghc-9.6.2/rts-1.0.2/include/ghcversion.h
+: hash: 9cac75f8cd439ea32123c78b066817c642e99d5f6683e675c327513f36e1532e
+? /var/home/chris/Projects/aws-for-jobs/03_-_ec2_basics/deploy-an-instance/deploy-hs/.stack-work/dist/x86_64-linux-tinfo6/Cabal-3.10.1.0/build/deploy-hs-test/autogen/Paths_deploy_hs.hs
+: hash: e58d357e7db5aab3e0ba355afe56d3b6eaf78ec9761396fb1d2130359255caa1
+? /var/home/chris/Projects/aws-for-jobs/03_-_ec2_basics/deploy-an-instance/deploy-hs/.stack-work/dist/x86_64-linux-tinfo6/Cabal-3.10.1.0/build/deploy-hs-test/autogen/cabal_macros.h
+: hash: afe13594dfdc09cccc41d5254a18214934198a95b951a66582d4acc1b6adf580
+/var/home/chris/Projects/aws-for-jobs/03_-_ec2_basics/deploy-an-instance/deploy-hs/deploy-hs.cabal:
+  hash: 9af474d91eaab51b67df1b336e7e0e4e9c03697614030c35824385de80b51e18
+/var/home/chris/Projects/aws-for-jobs/03_-_ec2_basics/deploy-an-instance/deploy-hs/package.yaml:
+  hash: 50272042f1e0ec76314350c3e005e3bbf7571c6d64922a99e6e3482ef80e6cbd
+/var/home/chris/Projects/aws-for-jobs/03_-_ec2_basics/deploy-an-instance/deploy-hs/test/Spec.hs:
+  hash: f24fc42d20faff3d25eee1aa211e8c1495f6e18a09f9bfec03bfb2550f9908bf

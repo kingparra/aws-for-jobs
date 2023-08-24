@@ -16,6 +16,21 @@ library
   hs-source-dirs:
       src
   build-depends:
+      amazonka
+    , amazonka-core
+    , amazonka-ec2
+    , base >=4.7 && <5
+    , lens
+    , text
+  default-language: Haskell2010
+
+executable app
+  main-is: Main.hs
+  other-modules:
+      Paths_deploy_hs
+  hs-source-dirs:
+      app
+  build-depends:
       base >=4.7 && <5
   default-language: Haskell2010
 
@@ -30,6 +45,7 @@ test-suite deploy-hs-test
   build-depends:
       amazonka
     , amazonka-core
+    , amazonka-ec2
     , base >=4.7 && <5
     , deploy-hs
     , hspec
