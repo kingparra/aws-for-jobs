@@ -60,3 +60,8 @@ cdk.out/
 
 # Draw.io diagram swap and backup files
 .$*.drawio.*
+
+# Haskell toolstack
+.stack-work
+*.hi
+*.o
