@@ -6,6 +6,14 @@ executables:
   app:
     main: Main.hs
     source-dirs: app
+    dependencies:
+      - deploy-hs
+      - hspec
+      - text
+      - lens
+      - amazonka
+      - amazonka-core
+      - amazonka-ec2
 
 library:
   source-dirs: src
