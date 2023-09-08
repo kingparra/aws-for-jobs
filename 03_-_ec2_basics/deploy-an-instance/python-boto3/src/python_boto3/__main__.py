@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 import boto3
-import pprint
-ec2 = boto3.client('ec2')
+import time
+ec2client = boto3.client('ec2')
+ec2 = boto3.resource('ec2')
 
-img_response = ec2.describe_images(
+img_response = ec2client.describe_images(
     Filters=[
         {'Name': 'name', 'Values': ['amzn2-ami-hvm-*']},
         {'Name': 'description', 'Values': ['Amazon Linux 2 AMI*']},
@@ -13,13 +14,11 @@ img_response = ec2.describe_images(
     Owners=['amazon']
 )
 
-# Sort the images by creation date in descending order to get the latest one
-images = sorted(img_response['Images'], key=lambda x: x['CreationDate'], reverse=True)
+latest_ami_id = sorted(img_response['Images'],
+                       key=lambda x: x['CreationDate'],
+                       reverse=True)[0]['ImageId']
 
-# Extract the latest Amazon Linux 2 AMI ID
-latest_ami_id = images[0]['ImageId']
-
-response = ec2.run_instances(
+instance = ec2.create_instances(
     ImageId=latest_ami_id,
     InstanceType='t2.micro',
     KeyName='precision',
@@ -29,16 +28,18 @@ response = ec2.run_instances(
             'DeviceIndex': 0,
         },
     ],
+    Monitoring={'Enabled': True},
     MinCount=1,
     MaxCount=1
-    )
+    )[0]
 
+# if the instance is up and has status OK, after 40 attempts
+#   print the instance id and public ip address of that instance
 
-instance_id = response['Instances'][0]['InstanceId']
-
-print(f"Launched EC2 instance with ID: {instance_id}")
-
-def get_instance_public_ip(instance_id):
- return ec2.describe_instances(InstanceIds=[instance_id])['Reservations'][0]['Instances'][0]['PublicIpAddress']
-
-print(f"public ip address: {get_instance_public_ip(instance_id)}")
+try:
+  instance.wait_until_running()
+   # needed to refresh ip info https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2/instance/index.html#EC2.Instance
+  instance.reload()
+  print(f"{instance.instance_id} is up and running on {instance.public_ip_address}")
+except e:
+  print(f"{instance.instance_id} cannot launch")
