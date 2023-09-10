@@ -49,9 +49,9 @@ instance = ec2.create_instances(
         {
             'AssociatePublicIpAddress': True,
             'DeviceIndex': 0,
+            'Groups':  [sg.group_id]
         },
     ],
-    SecurityGroupIds=[sg.id],
     TagSpecifications=[{
       'ResourceType': 'instance',
       'Tags': [{'Key': 'Name', 'Value': 'boto3-instance'}]}],
