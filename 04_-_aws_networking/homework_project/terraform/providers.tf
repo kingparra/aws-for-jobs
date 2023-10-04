@@ -15,15 +15,11 @@ terraform {
   }
 }
 
+
 provider "aws" {
-  shared_config_files = ["/home/chris/.aws/config"]
-  shared_credentials_files = ["/home/chris/.aws/credentials"]
-  profile = "default"
-  region = "us-east-1"
   default_tags {
     tags = {
       AssignmentName = "mod_4_homework_project"
-      # SessionName = random_pet.session_name.id
     }
   }
 }
