@@ -17,6 +17,8 @@ terraform {
 
 
 provider "aws" {
+  sts_region = "us-east-1"
+  role_arn = "arn:aws:iam::972171577695:role/spacelift-role"
   default_tags {
     tags = {
       AssignmentName = "mod_4_homework_project"
